@@ -30,3 +30,9 @@ export interface Profile {
   created_at: string
   updated_at: string
 }
+
+export type ProfileWithRestaurant = {
+  first_name: string
+  last_name: string
+  restaurant: { name: string } | null
+}
