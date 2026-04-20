@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "@/lib/auth";
 import {
   LayoutDashboard,
   CalendarRange,
@@ -14,6 +13,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 
 const NAV_SECTIONS = [
   {
@@ -47,19 +47,17 @@ const icons: Record<string, React.ElementType> = {
   settings: Settings,
 };
 
-interface SidebarProps {
-  restaurantName: string;
-  managerName: string;
-  managerInitials: string;
-}
+export default function Sidebar() {
+  const { profile, restaurant, signOut } = useAuthStore();
 
-export default function Sidebar({
-  restaurantName,
-  managerName,
-  managerInitials,
-}: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const restaurantName = restaurant?.name ?? "";
+  const firstName = profile?.first_name ?? "";
+  const lastName = profile?.last_name ?? "";
+  const fullName = `${firstName} ${lastName}`.trim();
+  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
   async function handleSignOut() {
     await signOut();
@@ -68,7 +66,6 @@ export default function Sidebar({
 
   return (
     <aside className="flex h-full w-55 min-w-55 flex-col bg-[#1a1a18]">
-      {/* Logo */}
       <div className="border-b border-white/8 px-5 py-5">
         <p className="font-serif text-[15px] tracking-wide text-[#f0ece4]">
           Mise en Place
@@ -78,7 +75,6 @@ export default function Sidebar({
         </p>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-3">
         {NAV_SECTIONS.map((section) => (
           <div key={section.label} className="mb-1 px-3">
@@ -124,12 +120,10 @@ export default function Sidebar({
       <div className="border-t border-white/8 p-3">
         <div className="flex items-center gap-2.5 rounded-md px-2.5 py-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#c9a96e]/20 text-[11px] font-medium text-[#c9a96e]">
-            {managerInitials}
+            {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[12px] text-[#f0ece4]/70">
-              {managerName}
-            </p>
+            <p className="truncate text-[12px] text-[#f0ece4]/70">{fullName}</p>
             <p className="text-[10px] text-[#f0ece4]/30">Manager</p>
           </div>
           <button
