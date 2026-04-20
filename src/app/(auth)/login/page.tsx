@@ -31,7 +31,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-[#faf9f6]">
-      {/* Left panel — branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#1a1a18] flex-col justify-between p-12">
         <div>
           <p className="font-serif text-[22px] tracking-wide text-[#f0ece4]">Mise en Place</p>
@@ -50,10 +49,8 @@ export default function LoginPage() {
         <p className="text-[11px] text-[#f0ece4]/20">© 2026 Mise en Place</p>
       </div>
 
-      {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
-          {/* Mobile logo */}
           <div className="lg:hidden mb-10">
             <p className="font-serif text-[20px] tracking-wide text-[#1a1a18]">Mise en Place</p>
             <p className="mt-0.5 text-[10px] uppercase tracking-[0.12em] text-[#1a1a18]/30">
