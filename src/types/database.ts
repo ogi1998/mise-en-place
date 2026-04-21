@@ -36,3 +36,26 @@ export type ProfileWithRestaurant = {
   last_name: string
   restaurant: { name: string } | null
 }
+
+export type BookingStatus = 'pending' | 'confirmed' | 'seated' | 'completed' | 'cancelled' | 'no_show'
+export type BookingSource = 'online' | 'walk_in' | 'phone' | 'manual'
+
+export interface Booking {
+  id: string
+  restaurant_id: string
+  service_area_id: string
+  guest_id: string | null
+  booking_number: number
+  status: BookingStatus
+  source: BookingSource
+  party_size: number
+  booking_date: string
+  start_time: string
+  end_time: string
+  notes: string | null
+  internal_notes: string | null
+  allergens: string[] | null
+  is_delayed: boolean
+  created_at: string
+  updated_at: string
+}
