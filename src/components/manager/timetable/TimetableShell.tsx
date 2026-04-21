@@ -6,9 +6,9 @@ import type { TimetableArea, TimetableTable, TimetableBooking, DaySchedule } fro
 import { getTimetableBookings, getTimetableTables, getDaySchedule } from '@/services/timetable/queries'
 import { FALLBACK_SCHEDULE } from '@/services/timetable/types'
 import TimetableHeader from '@/components/manager/timetable/TimetableHeader'
-import AreaTabs from '@/components/manager/timetable/AreaTabs'
+import AreaTabs from '@/components/manager/ui/AreaTabs'
 import TimetableGrid from '@/components/manager/timetable/TimetableGrid'
-import BookingModal from '@/components/manager/timetable/BookingModal'
+import BookingModal from '@/components/manager/ui/BookingModal'
 
 type TimetableShellProps = {
   restaurantId: string
