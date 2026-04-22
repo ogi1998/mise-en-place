@@ -126,19 +126,19 @@ export default function InlineTableForm({
           </label>
           <label className="flex items-center gap-2.5 cursor-pointer">
             <input
-              {...register('disabled_online')}
+              {...register('is_active_online')}
               type="checkbox"
               className="w-4 h-4 accent-[#1a1a18]"
             />
-            <span className="text-sm text-[#1a1a18]">Disable online booking</span>
+            <span className="text-sm text-[#1a1a18]">Active online booking</span>
           </label>
           <label className="flex items-center gap-2.5 cursor-pointer">
             <input
-              {...register('disabled')}
+              {...register('is_active')}
               type="checkbox"
               className="w-4 h-4 accent-[#1a1a18]"
             />
-            <span className="text-sm text-[#1a1a18]">Disabled</span>
+            <span className="text-sm text-[#1a1a18]">Is Active</span>
           </label>
         </div>
       </div>

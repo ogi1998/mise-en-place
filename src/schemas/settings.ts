@@ -25,8 +25,8 @@ export const tableSchema = z
 		seats: z.number().min(1, 'Default seats must be at least 1'),
 		max_seats: z.number().min(1, 'Max seats must be at least 1'),
 		allow_multi: z.boolean(),
-		disabled: z.boolean(),
-		disabled_online: z.boolean()
+		is_active: z.boolean(),
+		is_active_online: z.boolean()
 	})
 	.refine((data) => data.min_seats <= data.seats, {
 		message: 'Default seats must be greater than or equal to min seats',
@@ -43,4 +43,4 @@ export const tableSchema = z
 
 export type ServiceAreaFormData = z.infer<typeof serviceAreaSchema>;
 export type AreaLockPeriodFormData = z.infer<typeof areaLockPeriodSchema>;
-export type TableFormData = z.infer<typeof tableSchema>;
+export type TableFormData = z.infer<typeof tableSchema>

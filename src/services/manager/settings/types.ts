@@ -24,8 +24,8 @@ export type Table = {
   seats: number
   max_seats: number
   allow_multi: boolean
-  disabled: boolean
-  disabled_online: boolean
+  is_active: boolean
+  is_active_online: boolean
   created_at: string
   updated_at: string
 }
@@ -59,8 +59,8 @@ export type TableFormData = {
   seats: number
   max_seats: number
   allow_multi: boolean
-  disabled: boolean
-  disabled_online: boolean
+  is_active: boolean
+  is_active_online: boolean
 }
 
 export type AreaLockPeriodFormData = {

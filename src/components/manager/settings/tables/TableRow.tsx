@@ -6,7 +6,7 @@ type Props = {
   confirmDelete: string | null
   onEdit: (table: Table) => void
   onDelete: (id: string) => void
-  onToggleField: (table: Table, field: 'disabled' | 'disabled_online') => void
+  onToggleField: (table: Table, field: 'is_active' | 'is_active_online') => void
   onSetConfirmDelete: (id: string | null) => void
 }
 
@@ -35,20 +35,20 @@ export default function TableRow({
       </td>
       <td className="px-4 py-3 text-center">
         <button
-          onClick={() => onToggleField(table, 'disabled_online')}
-          className={`transition-colors ${table.disabled_online ? 'text-red-400' : 'text-emerald-500'}`}
-          title={table.disabled_online ? 'Online booking disabled' : 'Online booking enabled'}
+          onClick={() => onToggleField(table, 'is_active_online')}
+          className={`transition-colors ${table.is_active_online ? 'text-emerald-500' : 'text-red-400'}`}
+          title={table.is_active_online ? 'Online booking enabled' : 'Online booking disabled'}
         >
-          {table.disabled_online ? <ToggleLeft size={18} /> : <ToggleRight size={18} />}
+          {table.is_active_online ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
         </button>
       </td>
       <td className="px-4 py-3 text-center">
         <button
-          onClick={() => onToggleField(table, 'disabled')}
-          className={`transition-colors ${table.disabled ? 'text-red-400' : 'text-emerald-500'}`}
-          title={table.disabled ? 'Table disabled' : 'Table active'}
+          onClick={() => onToggleField(table, 'is_active')}
+          className={`transition-colors ${table.is_active ? 'text-emerald-500' : 'text-red-400'}`}
+          title={table.is_active ? 'Table active' : 'Table disabled'}
         >
-          {table.disabled ? <ToggleLeft size={18} /> : <ToggleRight size={18} />}
+          {table.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
         </button>
       </td>
       <td className="px-4 py-3">

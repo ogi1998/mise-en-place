@@ -29,7 +29,7 @@ export async function createServiceArea(
 		.from('service_areas')
 		.insert({
 			...form,
-      name: form.name.trim(),
+			name: form.name.trim(),
 			restaurant_id: restaurantId,
 			description: form.description || null
 		})
@@ -58,7 +58,7 @@ export async function updateServiceArea(
 		.from('service_areas')
 		.update({
 			...form,
-      name: form.name?.trim(),
+			name: form.name?.trim(),
 			description: form.description || null,
 			updated_at: new Date().toISOString()
 		})
@@ -115,7 +115,7 @@ export async function createTable(
 		.from('tables')
 		.insert({
 			...form,
-      name: form.name.trim(),
+			name: form.name.trim(),
 			restaurant_id: restaurantId,
 			service_area_id: serviceAreaId,
 			nickname: form.nickname || null
@@ -145,7 +145,7 @@ export async function updateTable(
 		.from('tables')
 		.update({
 			...form,
-      name: form.name?.trim(),
+			...(form.name && { name: form.name.trim() }),
 			nickname: form.nickname !== undefined ? form.nickname || null : undefined,
 			updated_at: new Date().toISOString()
 		})
@@ -183,31 +183,31 @@ export async function getAreaLockPeriods(supabase: SupabaseClient, serviceAreaId
 }
 
 export async function createAreaLockPeriod(
-  supabase: SupabaseClient,
-  restaurantId: string,
-  serviceAreaId: string,
-  form: AreaLockPeriodFormData
-): Promise<{ data: AreaLockPeriod | null, error: string | null }> {
-  const { data, error } = await supabase
-    .from('area_lock_periods')
-    .insert({
-      ...form,
-      restaurant_id: restaurantId,
-      service_area_id: serviceAreaId,
-      name: form.name || null,
-      reason: form.reason || null,
-    })
-    .select()
-    .single()
+	supabase: SupabaseClient,
+	restaurantId: string,
+	serviceAreaId: string,
+	form: AreaLockPeriodFormData
+): Promise<{ data: AreaLockPeriod | null; error: string | null }> {
+	const { data, error } = await supabase
+		.from('area_lock_periods')
+		.insert({
+			...form,
+			restaurant_id: restaurantId,
+			service_area_id: serviceAreaId,
+			name: form.name || null,
+			reason: form.reason || null
+		})
+		.select()
+		.single();
 
-  if (error) {
-    if (error.code === '23514') {
-      return { data: null, error: 'End date must be after start date.' }
-    }
-    return { data: null, error: error.message }
-  }
+	if (error) {
+		if (error.code === '23514') {
+			return { data: null, error: 'End date must be after start date.' };
+		}
+		return { data: null, error: error.message };
+	}
 
-  return { data: data as AreaLockPeriod, error: null }
+	return { data: data as AreaLockPeriod, error: null };
 }
 
 export async function deleteAreaLockPeriod(supabase: SupabaseClient, id: string): Promise<void> {
