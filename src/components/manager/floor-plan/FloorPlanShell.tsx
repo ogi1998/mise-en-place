@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { TimetableArea } from '@/services/timetable/types';
-import type { FloorPlanTable, FloorPlanBooking, TableWithStatus } from '@/services/floor-plan/types';
-import { getFloorPlanTables, getFloorPlanBookings } from '@/services/floor-plan/queries';
-import { computeTableStatuses } from '@/services/floor-plan/utils';
+import type { TimetableArea } from '@/services/manager/timetable/types';
+import type { FloorPlanTable, FloorPlanBooking, TableWithStatus } from '@/services/manager/floor-plan/types';
+import { getFloorPlanTables, getFloorPlanBookings } from '@/services/manager/floor-plan/queries';
+import { computeTableStatuses } from '@/services/manager/floor-plan/utils';
 import AreaTabs from '@/components/manager/ui/AreaTabs';
 import FloorPlanGrid from './FloorPlanGrid';
 import BookingModal from '@/components/manager/ui/BookingModal';

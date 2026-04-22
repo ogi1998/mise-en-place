@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { X, Phone, Mail, AlertTriangle, Users } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import type { TimetableBooking } from '@/services/timetable/types';
-import type { FloorPlanBooking, FloorPlanTable } from '@/services/floor-plan/types';
-import { isoToHHMM } from '@/services/timetable/utils';
-import { hasCapacityMismatch } from '@/services/floor-plan/utils';
+import type { TimetableBooking } from '@/services/manager/timetable/types';
+import type { FloorPlanBooking, FloorPlanTable } from '@/services/manager/floor-plan/types';
+import { isoToHHMM } from '@/services/manager/timetable/utils';
+import { hasCapacityMismatch } from '@/services/manager/floor-plan/utils';
 import type { BookingStatus } from '@/types/database';
 import CapacityWarning from '@/components/manager/floor-plan/CapacityWarning';
 
@@ -23,21 +23,27 @@ type BookingModalProps = {
 };
 
 const STATUSES: { value: BookingStatus; label: string }[] = [
-	{ value: 'pending',   label: 'Pending'   },
+	{ value: 'pending', label: 'Pending' },
 	{ value: 'confirmed', label: 'Confirmed' },
-	{ value: 'seated',    label: 'Seated'    },
+	{ value: 'seated', label: 'Seated' },
 	{ value: 'completed', label: 'Completed' },
-	{ value: 'cancelled', label: 'Cancelled' },
+	{ value: 'cancelled', label: 'Cancelled' }
 ];
 
 function statusColors(status: string) {
 	switch (status) {
-		case 'confirmed': return 'bg-[#d4e8d0] text-[#2a5c24]';
-		case 'pending':   return 'bg-[#fdf0d5] text-[#7a5c1a]';
-		case 'seated':    return 'bg-[#d0e4f7] text-[#1a3d6b]';
-		case 'completed': return 'bg-[#e8e8e8] text-[#444]';
-		case 'cancelled': return 'bg-[#f7d5d5] text-[#6b1a1a]';
-		default:          return 'bg-black/6 text-black/50';
+		case 'confirmed':
+			return 'bg-[#d4e8d0] text-[#2a5c24]';
+		case 'pending':
+			return 'bg-[#fdf0d5] text-[#7a5c1a]';
+		case 'seated':
+			return 'bg-[#d0e4f7] text-[#1a3d6b]';
+		case 'completed':
+			return 'bg-[#e8e8e8] text-[#444]';
+		case 'cancelled':
+			return 'bg-[#f7d5d5] text-[#6b1a1a]';
+		default:
+			return 'bg-black/6 text-black/50';
 	}
 }
 
@@ -48,14 +54,12 @@ export default function BookingModal({
 	onUpdate,
 	table,
 	unassignedBookings,
-	onAssigned,
+	onAssigned
 }: BookingModalProps) {
 	const isFloorPlanMode = !!table;
 	const isOccupied = !!booking;
 
-	const [status, setStatus] = useState<BookingStatus>(
-		(booking?.status as BookingStatus) ?? 'pending'
-	);
+	const [status, setStatus] = useState<BookingStatus>((booking?.status as BookingStatus) ?? 'pending');
 	const [notes, setNotes] = useState(booking?.notes ?? '');
 	const [internalNotes, setInternalNotes] = useState(booking?.internal_notes ?? '');
 	const [isDelayed, setIsDelayed] = useState(booking?.is_delayed ?? false);
@@ -64,13 +68,9 @@ export default function BookingModal({
 	const [selectedBookingId, setSelectedBookingId] = useState('');
 	const [isAssigning, setIsAssigning] = useState(false);
 
-	const guestName = booking?.guests
-		? `${booking.guests.first_name} ${booking.guests.last_name}`
-		: 'Walk-in';
+	const guestName = booking?.guests ? `${booking.guests.first_name} ${booking.guests.last_name}` : 'Walk-in';
 
-	const bookingNumber = booking
-		? `#${String(booking.booking_number).padStart(4, '0')}`
-		: '';
+	const bookingNumber = booking ? `#${String(booking.booking_number).padStart(4, '0')}` : '';
 
 	const selectedUnassigned = unassignedBookings?.find((b) => b.id === selectedBookingId);
 	const showCapacityWarning = selectedUnassigned && table && hasCapacityMismatch(selectedUnassigned, table);
@@ -87,21 +87,23 @@ export default function BookingModal({
 					internal_notes: internalNotes || null,
 					is_delayed: isDelayed,
 					...(status === 'confirmed' ? { confirmed_at: new Date().toISOString() } : {}),
-					...(status === 'cancelled'  ? { cancelled_at: new Date().toISOString() }  : {}),
+					...(status === 'cancelled' ? { cancelled_at: new Date().toISOString() } : {})
 				})
 				.eq('id', booking.id)
 				.eq('restaurant_id', restaurantId)
-				.select(`
+				.select(
+					`
 					id, booking_number, status, party_size,
 					start_time, end_time, notes, internal_notes, is_delayed,
 					guests(first_name, last_name, email, phone)
-				`)
+				`
+				)
 				.single();
 
 			if (data) {
 				onUpdate?.({
 					...(data as unknown as ModalBooking),
-					table_ids: booking.table_ids,
+					table_ids: booking.table_ids
 				});
 				onClose();
 			}
@@ -114,13 +116,11 @@ export default function BookingModal({
 		if (!selectedBookingId || !table) return;
 		setIsAssigning(true);
 		try {
-			await supabase
-				.from('booking_tables')
-				.insert({
-					booking_id: selectedBookingId,
-					table_id: table.id,
-					restaurant_id: restaurantId,
-				});
+			await supabase.from('booking_tables').insert({
+				booking_id: selectedBookingId,
+				table_id: table.id,
+				restaurant_id: restaurantId
+			});
 			onAssigned?.();
 		} finally {
 			setIsAssigning(false);
@@ -133,9 +133,7 @@ export default function BookingModal({
 				<div>
 					<p className='font-serif text-[17px] text-[#1a1a18]'>
 						{table.name}
-						{table.nickname && (
-							<span className='ml-1.5 text-[13px] text-black/40'>{table.nickname}</span>
-						)}
+						{table.nickname && <span className='ml-1.5 text-[13px] text-black/40'>{table.nickname}</span>}
 					</p>
 					<div className='mt-0.5 flex items-center gap-1.5 text-[12px] text-black/40'>
 						<Users className='h-3 w-3' />
@@ -173,12 +171,10 @@ export default function BookingModal({
 							</p>
 							<div className='space-y-1.5'>
 								{bookings.map((b) => {
-									const name = b.guests
-										? `${b.guests.first_name} ${b.guests.last_name}`
-										: 'Walk-in';
+									const name = b.guests ? `${b.guests.first_name} ${b.guests.last_name}` : 'Walk-in';
 									const time = new Date(b.start_time).toLocaleTimeString('sl-SI', {
 										hour: '2-digit',
-										minute: '2-digit',
+										minute: '2-digit'
 									});
 									return (
 										<button
@@ -188,11 +184,11 @@ export default function BookingModal({
 												selectedBookingId === b.id
 													? 'border-[#1a1a18] bg-[#1a1a18]/4'
 													: 'border-black/8 hover:border-black/15'
-											}`}
-										>
+											}`}>
 											<p className='text-[13px] font-medium text-[#1a1a18]'>{name}</p>
 											<p className='text-[11px] text-black/40'>
-												{time} · {b.party_size} guests · #{String(b.booking_number).padStart(4, '0')}
+												{time} · {b.party_size} guests · #
+												{String(b.booking_number).padStart(4, '0')}
 											</p>
 										</button>
 									);
@@ -210,16 +206,14 @@ export default function BookingModal({
 				<div className='flex items-center justify-end gap-2 border-t border-black/6 px-5 py-3'>
 					<button
 						onClick={onClose}
-						className='rounded-lg px-4 py-2 text-[12px] text-black/40 transition-colors hover:bg-black/5 hover:text-black/70'
-					>
+						className='rounded-lg px-4 py-2 text-[12px] text-black/40 transition-colors hover:bg-black/5 hover:text-black/70'>
 						Cancel
 					</button>
 					{bookings.length > 0 && (
 						<button
 							onClick={handleAssign}
 							disabled={!selectedBookingId || isAssigning}
-							className='rounded-lg bg-[#1a1a18] px-4 py-2 text-[12px] font-medium text-[#faf9f6] transition-opacity hover:opacity-80 disabled:opacity-40'
-						>
+							className='rounded-lg bg-[#1a1a18] px-4 py-2 text-[12px] font-medium text-[#faf9f6] transition-opacity hover:opacity-80 disabled:opacity-40'>
 							{isAssigning ? 'Assigning...' : 'Assign to table'}
 						</button>
 					)}
@@ -238,8 +232,7 @@ export default function BookingModal({
 							onClick={() => setActiveTab(tab)}
 							className={`relative py-2.5 pr-4 text-[12px] font-medium capitalize transition-colors ${
 								activeTab === tab ? 'text-[#1a1a18]' : 'text-black/35 hover:text-black/60'
-							}`}
-						>
+							}`}>
 							{tab}
 							{activeTab === tab && (
 								<span className='absolute bottom-0 left-0 right-4 h-0.5 rounded-full bg-[#1a1a18]' />
@@ -273,8 +266,7 @@ export default function BookingModal({
 												status === s.value
 													? statusColors(s.value)
 													: 'bg-black/4 text-black/40 hover:bg-black/8'
-											}`}
-										>
+											}`}>
 											{s.label}
 										</button>
 									))}
@@ -292,8 +284,7 @@ export default function BookingModal({
 									onClick={() => setIsDelayed(!isDelayed)}
 									className={`relative h-5 w-9 rounded-full transition-colors ${
 										isDelayed ? 'bg-red-500' : 'bg-black/15'
-									}`}
-								>
+									}`}>
 									<span
 										className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
 											isDelayed ? 'translate-x-0' : '-translate-x-4'
@@ -311,8 +302,7 @@ export default function BookingModal({
 										{booking.guests.phone && (
 											<a
 												href={`tel:${booking.guests.phone}`}
-												className='flex items-center gap-2 text-[12px] text-black/60 hover:text-black/90'
-											>
+												className='flex items-center gap-2 text-[12px] text-black/60 hover:text-black/90'>
 												<Phone className='h-3 w-3 shrink-0 text-black/30' />
 												{booking.guests.phone}
 											</a>
@@ -320,8 +310,7 @@ export default function BookingModal({
 										{booking.guests.email && (
 											<a
 												href={`mailto:${booking.guests.email}`}
-												className='flex items-center gap-2 text-[12px] text-black/60 hover:text-black/90'
-											>
+												className='flex items-center gap-2 text-[12px] text-black/60 hover:text-black/90'>
 												<Mail className='h-3 w-3 shrink-0 text-black/30' />
 												{booking.guests.email}
 											</a>
@@ -365,15 +354,13 @@ export default function BookingModal({
 				<div className='flex items-center justify-end gap-2 border-t border-black/6 px-5 py-3'>
 					<button
 						onClick={onClose}
-						className='rounded-lg px-4 py-2 text-[12px] text-black/40 transition-colors hover:bg-black/5 hover:text-black/70'
-					>
+						className='rounded-lg px-4 py-2 text-[12px] text-black/40 transition-colors hover:bg-black/5 hover:text-black/70'>
 						Cancel
 					</button>
 					<button
 						onClick={handleSave}
 						disabled={isSaving}
-						className='rounded-lg bg-[#1a1a18] px-4 py-2 text-[12px] font-medium text-[#faf9f6] transition-opacity hover:opacity-80 disabled:opacity-40'
-					>
+						className='rounded-lg bg-[#1a1a18] px-4 py-2 text-[12px] font-medium text-[#faf9f6] transition-opacity hover:opacity-80 disabled:opacity-40'>
 						{isSaving ? 'Saving...' : 'Save changes'}
 					</button>
 				</div>
@@ -389,8 +376,7 @@ export default function BookingModal({
 					{renderHeader()}
 					<button
 						onClick={onClose}
-						className='rounded-md p-1 text-black/30 transition-colors hover:bg-black/5 hover:text-black/60'
-					>
+						className='rounded-md p-1 text-black/30 transition-colors hover:bg-black/5 hover:text-black/60'>
 						<X className='h-4 w-4' />
 					</button>
 				</div>

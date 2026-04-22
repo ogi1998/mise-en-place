@@ -1,9 +1,12 @@
 'use client'
 
-import type { TimetableArea } from '@/services/timetable/types'
+type Area = {
+  id: string
+  name: string
+}
 
 type AreaTabsProps = {
-  areas: TimetableArea[]
+  areas: Area[]
   activeAreaId: string | null
   onAreaChange: (areaId: string) => void
 }

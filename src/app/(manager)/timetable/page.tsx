@@ -1,30 +1,27 @@
-import { createSupabaseServerClient } from '@/lib/supabase-server'
-import { getTimetableAreas, getTimetableBookings, getDaySchedule, getTimetableTables } from '@/services/timetable/queries'
-import TimetableShell from '@/components/manager/timetable/TimetableShell'
+import { requireRestaurant } from '@/lib/require-restaurant';
+import {
+  getTimetableAreas,
+  getTimetableBookings,
+  getDaySchedule,
+  getTimetableTables
+} from '@/services/manager/timetable/queries';
+import TimetableShell from '@/components/manager/timetable/TimetableShell';
 
 export default async function TimetablePage() {
-  const supabase = await createSupabaseServerClient()
+  const { supabase, restaurantId } = await requireRestaurant();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('restaurant_id')
-    .single()
+  const todayDate = new Date().toISOString().split('T')[0];
 
-  const restaurantId = profile?.restaurant_id
-  if (!restaurantId) return null
-
-  const todayDate = new Date().toISOString().split('T')[0]
-
-  const areas = await getTimetableAreas(supabase, restaurantId)
-  const firstAreaId = areas[0]?.id ?? null
+  const areas = await getTimetableAreas(supabase, restaurantId);
+  const firstAreaId = areas[0]?.id ?? null;
 
   const [bookings, tables, schedule] = firstAreaId
     ? await Promise.all([
         getTimetableBookings(supabase, restaurantId, todayDate),
         getTimetableTables(supabase, restaurantId, firstAreaId),
-        getDaySchedule(supabase, restaurantId, firstAreaId, todayDate),
+        getDaySchedule(supabase, restaurantId, firstAreaId, todayDate)
       ])
-    : [[], [], null]
+    : [[], [], null];
 
   return (
     <TimetableShell
@@ -36,5 +33,5 @@ export default async function TimetablePage() {
       initialSchedule={schedule}
       initialAreaId={firstAreaId}
     />
-  )
+  );
 }
