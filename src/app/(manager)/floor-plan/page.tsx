@@ -1,33 +1,22 @@
-import { createSupabaseServerClient } from '@/lib/supabase-server'
-import { getFloorPlanTables, getFloorPlanBookings } from '@/services/floor-plan/queries'
-import { getTimetableAreas } from '@/services/timetable/queries'
-import FloorPlanShell from '@/components/manager/floor-plan/FloorPlanShell'
+import { requireRestaurant } from '@/lib/require-restaurant';
+import { getFloorPlanTables, getFloorPlanBookings } from '@/services/manager/floor-plan/queries';
+import { getTimetableAreas } from '@/services/manager/timetable/queries';
+import FloorPlanShell from '@/components/manager/floor-plan/FloorPlanShell';
 
 export default async function FloorPlanPage() {
-  const supabase = await createSupabaseServerClient()
+  const { supabase, restaurantId } = await requireRestaurant();
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const todayDate = new Date().toISOString().split('T')[0];
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('restaurant_id')
-    .eq('id', user!.id)
-    .single()
-
-  const restaurantId = profile?.restaurant_id
-  if (!restaurantId) return null
-
-  const todayDate = new Date().toISOString().split('T')[0]
-
-  const areas = await getTimetableAreas(supabase, restaurantId)
-  const firstAreaId = areas[0]?.id ?? null
+  const areas = await getTimetableAreas(supabase, restaurantId);
+  const firstAreaId = areas[0]?.id ?? null;
 
   const [tables, bookings] = firstAreaId
     ? await Promise.all([
         getFloorPlanTables(supabase, restaurantId, firstAreaId),
-        getFloorPlanBookings(supabase, restaurantId, todayDate),
+        getFloorPlanBookings(supabase, restaurantId, todayDate)
       ])
-    : [[], []]
+    : [[], []];
 
   return (
     <FloorPlanShell
@@ -37,5 +26,5 @@ export default async function FloorPlanPage() {
       initialBookings={bookings}
       initialAreaId={firstAreaId}
     />
-  )
+  );
 }
