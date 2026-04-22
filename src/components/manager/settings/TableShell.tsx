@@ -5,7 +5,8 @@ import { useTables } from '@/hooks/manager/settings/useTables'
 import AreaTabs from '@/components/manager/ui/AreaTabs'
 import TableRow from '@/components/manager/settings/tables/TableRow'
 import InlineTableForm from '@/components/manager/settings/tables/InlineTableForm'
-import type { ServiceArea, Table } from '@/services/manager/settings/types'
+import type { ServiceArea } from '@/services/manager/settings/service-areas/types'
+import type { Table } from '@/services/manager/settings/tables/types'
 
 type Props = {
   initialAreas: ServiceArea[]

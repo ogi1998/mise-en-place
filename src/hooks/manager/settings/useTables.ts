@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/lib/supabase';
-import { createTable, updateTable, deleteTable } from '@/services/manager/settings/queries';
-import { tableSchema, type TableFormData } from '@/schemas/settings';
-import type { ServiceArea, Table } from '@/services/manager/settings/types';
+import { createTable, updateTable, deleteTable } from '@/services/manager/settings/tables/queries';
+import { tableSchema, type TableFormData } from '@/schemas/manager/settings/tables';
+import type { Table } from '@/services/manager/settings/tables/types';
+import type { ServiceArea } from '@/services/manager/settings/service-areas/types';
 
 const DEFAULT_TABLE_FORM: TableFormData = {
 	name: '',

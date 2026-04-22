@@ -1,5 +1,5 @@
 import { Pencil, Trash2, ChevronDown, ChevronRight, Check, X } from 'lucide-react'
-import type { ServiceArea } from '@/services/manager/settings/types'
+import type { ServiceArea } from '@/services/manager/settings/service-areas/types'
 
 type Props = {
   area: ServiceArea

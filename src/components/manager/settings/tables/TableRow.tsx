@@ -1,5 +1,5 @@
 import { Pencil, Trash2, Check, X, ToggleLeft, ToggleRight } from 'lucide-react'
-import type { Table } from '@/services/manager/settings/types'
+import type { Table } from '@/services/manager/settings/tables/types'
 
 type Props = {
   table: Table

@@ -1,5 +1,5 @@
 import { requireRestaurant } from '@/lib/require-restaurant';
-import { getServiceAreas } from '@/services/manager/settings/queries';
+import { getServiceAreas } from '@/services/manager/settings/service-areas/queries';
 import ServiceAreasShell from '@/components/manager/settings/ServiceAreasShell';
 
 export default async function ServiceAreasPage() {

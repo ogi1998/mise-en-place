@@ -5,7 +5,7 @@ import { useServiceAreas } from '@/hooks/manager/settings/useServiceAreas'
 import AreaRow from '@/components/manager/settings/service-areas/AreaRow'
 import InlineAreaForm from '@/components/manager/settings/service-areas/InlineAreaForm'
 import LockPeriodsPanel from '@/components/manager/settings/service-areas/LockPeriodsPanel'
-import type { ServiceArea } from '@/services/manager/settings/types'
+import type { ServiceArea } from '@/services/manager/settings/service-areas/types'
 
 type Props = {
   initialAreas: ServiceArea[]

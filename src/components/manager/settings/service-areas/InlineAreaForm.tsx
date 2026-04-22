@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
-import type { ServiceAreaFormData } from '@/schemas/settings'
-import type { ServiceArea } from '@/services/manager/settings/types'
+import type { ServiceAreaFormData } from '@/schemas/manager/settings/service-areas'
+import type { ServiceArea } from '@/services/manager/settings/service-areas/types'
 
 type Props = {
   area?: ServiceArea

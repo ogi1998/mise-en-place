@@ -1,7 +1,7 @@
 import { Lock, Plus, X } from 'lucide-react';
 import type { UseFormReturn } from 'react-hook-form';
-import type { AreaLockPeriodFormData } from '@/schemas/settings';
-import type { AreaLockPeriod, ServiceArea } from '@/services/manager/settings/types';
+import type { AreaLockPeriodFormData } from '@/schemas/manager/settings/service-areas';
+import type { AreaLockPeriod, ServiceArea } from '@/services/manager/settings/service-areas/types';
 
 type Props = {
 	area: ServiceArea;

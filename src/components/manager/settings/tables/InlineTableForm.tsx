@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
-import type { TableFormData } from '@/schemas/settings'
-import type { Table } from '@/services/manager/settings/types'
+import type { TableFormData } from '@/schemas/manager/settings/tables'
+import type { Table } from '@/services/manager/settings/tables/types'
 
 const TABLE_SHAPES = [
   { value: 'rectangle', label: 'Rectangle' },

@@ -9,14 +9,14 @@ import {
 	getAreaLockPeriods,
 	createAreaLockPeriod,
 	deleteAreaLockPeriod
-} from '@/services/manager/settings/queries';
+} from '@/services/manager/settings/service-areas/queries';
 import {
 	serviceAreaSchema,
 	areaLockPeriodSchema,
 	type ServiceAreaFormData,
 	type AreaLockPeriodFormData
-} from '@/schemas/settings';
-import type { ServiceArea, AreaLockPeriod } from '@/services/manager/settings/types';
+} from '@/schemas/manager/settings/service-areas';
+import type { ServiceArea, AreaLockPeriod } from '@/services/manager/settings/service-areas/types';
 
 export function useServiceAreas(initialAreas: ServiceArea[], restaurantId: string) {
 	const [areas, setAreas] = useState<ServiceArea[]>(initialAreas);

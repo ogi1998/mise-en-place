@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { loginSchema, LoginFormData } from '@/schemas/auth'
+import { loginSchema, LoginFormData } from '@/schemas/manager/auth'
 import { signIn } from '@/lib/auth'
 import { useState } from 'react'
 
