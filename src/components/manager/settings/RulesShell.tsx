@@ -32,7 +32,7 @@ export default function RulesShell({ areas, initialAreaId, initialRules }: Props
         <p className="text-sm text-[#7a7060] mt-1">Configure booking rules per service area.</p>
       </div>
 
-      <AreaTabs areas={areas} activeAreaId={activeAreaId} onAreaChange={handleAreaChange} />
+      <AreaTabs areas={areas} activeAreaId={activeAreaId} onChange={handleAreaChange} />
 
       <div className="mt-5">
         <RulesForm

@@ -40,7 +40,7 @@ export async function getTimetableBookings(
 		.select(
 			`
       id, booking_number, status, party_size,
-      start_time, end_time, notes, internal_notes, is_delayed,
+      start_time, end_time, notes, internal_notes, is_delayed, allergens,
       guests(first_name, last_name, email, phone)
     `
 		)

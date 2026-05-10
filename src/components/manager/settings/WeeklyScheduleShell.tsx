@@ -44,7 +44,7 @@ export default function WeeklyScheduleShell({ areas, initialAreaId, initialSched
         <p className="text-sm text-[#7a7060] mt-1">Configure opening hours per service area.</p>
       </div>
 
-      <AreaTabs areas={areas} activeAreaId={activeAreaId} onAreaChange={handleAreaChange} />
+      <AreaTabs areas={areas} activeAreaId={activeAreaId} onChange={handleAreaChange} />
 
       <div className="mt-5 space-y-2">
         {schedules.map(schedule => (
