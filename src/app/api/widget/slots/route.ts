@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createAnonSupabaseClient } from '@/lib/supabase-anon'
 import {
   getWeeklySchedule,
   getSpecialDay,
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing params' }, { status: 400 })
   }
 
-  const supabase = await createSupabaseServerClient()
+  const supabase = await createAnonSupabaseClient()
 
   // 1. Check future booking window
   const rules = await getBookingRules(supabase, serviceAreaId)

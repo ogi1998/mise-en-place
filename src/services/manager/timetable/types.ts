@@ -25,6 +25,7 @@ export type TimetableBooking = {
   notes: string | null
   internal_notes: string | null
   is_delayed: boolean
+  allergens?: string[] | null | undefined
   table_ids: string[]
   guests: {
     first_name: string

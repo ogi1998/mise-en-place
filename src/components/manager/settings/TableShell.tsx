@@ -82,7 +82,7 @@ export default function TablesShell({ initialAreas, initialTables, restaurantId 
       <AreaTabs
         areas={initialAreas}
         activeAreaId={activeAreaId}
-        onAreaChange={handleSelectArea}
+        onChange={handleSelectArea}
       />
 
       {showForm && !editingTable && (
