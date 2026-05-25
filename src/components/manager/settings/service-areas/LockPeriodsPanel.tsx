@@ -1,21 +1,23 @@
-import { Lock, Plus, X } from 'lucide-react';
-import type { UseFormReturn } from 'react-hook-form';
-import type { AreaLockPeriodFormData } from '@/schemas/manager/settings/service-areas';
-import type { AreaLockPeriod, ServiceArea } from '@/services/manager/settings/service-areas/types';
+import { Controller } from 'react-hook-form'
+import { Lock, Plus, X } from 'lucide-react'
+import type { UseFormReturn } from 'react-hook-form'
+import type { AreaLockPeriodFormData } from '@/schemas/manager/settings/service-areas'
+import type { AreaLockPeriod, ServiceArea } from '@/services/manager/settings/service-areas/types'
+import DatePicker from '@/components/ui/DatePicker'
 
 type Props = {
-	area: ServiceArea;
-	lockPeriods: AreaLockPeriod[];
-	loadingLocks: string | null;
-	showLockForm: string | null;
-	lockForm: UseFormReturn<AreaLockPeriodFormData>;
-	lockFormLoading: boolean;
-	lockFormError: string | null;
-	onOpenLockForm: (areaId: string) => void;
-	onCancelLockForm: () => void;
-	onSubmitLock: () => void;
-	onDeleteLock: (areaId: string, lockId: string) => void;
-};
+	area: ServiceArea
+	lockPeriods: AreaLockPeriod[]
+	loadingLocks: string | null
+	showLockForm: string | null
+	lockForm: UseFormReturn<AreaLockPeriodFormData>
+	lockFormLoading: boolean
+	lockFormError: string | null
+	onOpenLockForm: (areaId: string) => void
+	onCancelLockForm: () => void
+	onSubmitLock: () => void
+	onDeleteLock: (areaId: string, lockId: string) => void
+}
 
 export default function LockPeriodsPanel({
 	area,
@@ -28,12 +30,9 @@ export default function LockPeriodsPanel({
 	onOpenLockForm,
 	onCancelLockForm,
 	onSubmitLock,
-	onDeleteLock
+	onDeleteLock,
 }: Props) {
-	const {
-		register,
-		formState: { errors }
-	} = lockForm;
+	const { register, control, formState: { errors } } = lockForm
 
 	return (
 		<div className='border-t border-[#e8e4dc] bg-[#faf9f6] px-5 py-4'>
@@ -64,10 +63,17 @@ export default function LockPeriodsPanel({
 						</div>
 						<div>
 							<label className='block text-xs font-medium text-[#5a5545] mb-1'>From *</label>
-							<input
-								{...register('start_date')}
-								type='date'
-								className='w-full px-3 py-1.5 border border-[#e8e4dc] rounded-lg text-sm focus:outline-none focus:border-[#1a1a18] transition-colors'
+							<Controller
+								control={control}
+								name="start_date"
+								render={({ field }) => (
+									<DatePicker
+										value={field.value ?? ''}
+										onChange={field.onChange}
+										hasError={!!errors.start_date}
+										theme="manager"
+									/>
+								)}
 							/>
 							{errors.start_date && (
 								<p className='text-[11px] text-red-500 mt-1'>{errors.start_date.message}</p>
@@ -75,10 +81,17 @@ export default function LockPeriodsPanel({
 						</div>
 						<div>
 							<label className='block text-xs font-medium text-[#5a5545] mb-1'>To *</label>
-							<input
-								{...register('end_date')}
-								type='date'
-								className='w-full px-3 py-1.5 border border-[#e8e4dc] rounded-lg text-sm focus:outline-none focus:border-[#1a1a18] transition-colors'
+							<Controller
+								control={control}
+								name="end_date"
+								render={({ field }) => (
+									<DatePicker
+										value={field.value ?? ''}
+										onChange={field.onChange}
+										hasError={!!errors.end_date}
+										theme="manager"
+									/>
+								)}
 							/>
 							{errors.end_date && (
 								<p className='text-[11px] text-red-500 mt-1'>{errors.end_date.message}</p>
@@ -138,10 +151,10 @@ export default function LockPeriodsPanel({
 				</div>
 			)}
 		</div>
-	);
+	)
 }
 
 function formatDate(iso: string) {
-	const [year, month, day] = iso.split('-');
-	return `${day}.${month}.${year}`;
+	const [year, month, day] = iso.split('-')
+	return `${day}.${month}.${year}`
 }
