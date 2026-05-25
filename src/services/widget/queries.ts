@@ -114,35 +114,68 @@ export async function createGuest(
     email: string;
     phone: string;
     allergens: string[];
+    auth_user_id: string;
   },
 ): Promise<{ id: string } | null> {
-  const { data: existing, error: existingError } = await supabase
+  // Check by auth_user_id first (returning authenticated user)
+  const { data: byUserId } = await supabase
+    .from("guests")
+    .select("id")
+    .eq("auth_user_id", payload.auth_user_id)
+    .maybeSingle();
+
+  if (byUserId) {
+    if (payload.allergens?.length) {
+      await supabase
+        .from("guests")
+        .update({ allergens: payload.allergens })
+        .eq("id", byUserId.id);
+    }
+    return byUserId;
+  }
+
+  // Check by email to link an existing anon guest to this auth account
+  const { data: byEmail } = await supabase
     .from("guests")
     .select("id")
     .eq("email", payload.email)
     .maybeSingle();
 
-  console.log("existing guest check:", existing, existingError);
-
-  if (existing) {
-    if (payload.allergens?.length) {
-      await supabase
-        .from("guests")
-        .update({ allergens: payload.allergens })
-        .eq("id", existing.id);
-    }
-    return existing;
+  if (byEmail) {
+    const updateData: Record<string, unknown> = {
+      auth_user_id: payload.auth_user_id,
+    };
+    if (payload.allergens?.length) updateData.allergens = payload.allergens;
+    await supabase.from("guests").update(updateData).eq("id", byEmail.id);
+    return byEmail;
   }
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("guests")
     .insert(payload)
     .select("id")
     .single();
 
-  console.log("guest insert result:", data, error);
-
   return data;
+}
+
+export async function getGuestByAuthUserId(
+  supabase: SupabaseClient,
+  authUserId: string,
+) {
+  const { data } = await supabase
+    .from("guests")
+    .select("id, first_name, last_name, email, phone, allergens")
+    .eq("auth_user_id", authUserId)
+    .maybeSingle();
+  return data as {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string | null;
+    phone: string | null;
+    allergens: string[] | null;
+  } | null;
 }
 
 export async function createBooking(

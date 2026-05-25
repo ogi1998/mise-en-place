@@ -3,17 +3,20 @@
 import { useState } from 'react'
 import StepPartySize from '@/components/widget/steps/StepPartySize'
 import StepDateTime from '@/components/widget/steps/StepDateTime'
+import StepOtp from '@/components/widget/steps/StepOtp'
+import StepLookup from '@/components/widget/steps/StepLookup'
 import StepGuestDetails from '@/components/widget/steps/StepGuestDetails'
 import StepConfirmation from '@/components/widget/steps/StepConfirmation'
 import type { WidgetServiceArea } from '@/services/widget/types'
 
-type Step = 'party-size' | 'datetime' | 'guest-details' | 'confirmation'
+type Step = 'party-size' | 'datetime' | 'lookup' | 'guest-details' | 'otp' | 'confirmation'
 
 export type BookingState = {
   partySize: number
   serviceAreaId: string
   date: string
   slot: string
+  guestUserId: string | null
   firstName: string
   lastName: string
   email: string
@@ -28,6 +31,7 @@ const INITIAL_STATE: BookingState = {
   serviceAreaId: '',
   date: '',
   slot: '',
+  guestUserId: null,
   firstName: '',
   lastName: '',
   email: '',
@@ -37,13 +41,15 @@ const INITIAL_STATE: BookingState = {
   bookingId: null,
 }
 
-const STEPS: Step[] = ['party-size', 'datetime', 'guest-details', 'confirmation']
+const STEPS: Step[] = ['party-size', 'datetime', 'lookup', 'guest-details', 'otp', 'confirmation']
 
 const STEP_LABELS: Record<Step, string> = {
   'party-size': 'Party',
   'datetime': 'Date & Time',
+  'lookup': 'You',
   'guest-details': 'Details',
-  'confirmation': 'Confirm',
+  'otp': 'Confirm',
+  'confirmation': 'Done',
 }
 
 type Props = {
@@ -60,7 +66,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
   })
 
   function updateBooking(updates: Partial<BookingState>) {
-    setBooking(prev => ({ ...prev, ...updates }))
+    setBooking((prev) => ({ ...prev, ...updates }))
   }
 
   function nextStep() {
@@ -75,6 +81,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
 
   const stepIndex = STEPS.indexOf(step)
   const isConfirmed = step === 'confirmation' && booking.bookingId !== null
+  const displayedSteps = STEPS.filter((s) => s !== 'confirmation')
 
   return (
     <div className="min-h-screen bg-[#f7f5f2] flex items-start justify-center py-10 px-4">
@@ -94,26 +101,34 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
         {/* Step indicator */}
         {!isConfirmed && (
           <div className="flex items-center justify-center gap-2 mb-8">
-            {STEPS.filter(s => s !== 'confirmation').map((s, i) => {
+            {displayedSteps.map((s, i) => {
               const isActive = s === step
               const isDone = STEPS.indexOf(s) < stepIndex
               return (
                 <div key={s} className="flex items-center gap-2">
                   <div className="flex items-center gap-1.5">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                      isDone
-                        ? 'bg-[#1a1a18] text-[#f5f0e8]'
-                        : isActive
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                        isDone
                           ? 'bg-[#1a1a18] text-[#f5f0e8]'
-                          : 'bg-[#e8e4dc] text-[#a09880]'
-                    }`}>
+                          : isActive
+                            ? 'bg-[#1a1a18] text-[#f5f0e8]'
+                            : 'bg-[#e8e4dc] text-[#a09880]'
+                      }`}
+                    >
                       {isDone ? '✓' : i + 1}
                     </div>
-                    <span className={`text-xs hidden sm:block ${isActive ? 'text-[#1a1a18] font-medium' : 'text-[#a09880]'}`}>
+                    <span
+                      className={`text-xs hidden sm:block ${
+                        isActive ? 'text-[#1a1a18] font-medium' : 'text-[#a09880]'
+                      }`}
+                    >
                       {STEP_LABELS[s]}
                     </span>
                   </div>
-                  {i < 2 && <div className="w-8 h-px bg-[#e8e4dc]" />}
+                  {i < displayedSteps.length - 1 && (
+                    <div className="w-6 h-px bg-[#e8e4dc]" />
+                  )}
                 </div>
               )
             })}
@@ -139,8 +154,24 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
               onBack={prevStep}
             />
           )}
+          {step === 'lookup' && (
+            <StepLookup
+              booking={booking}
+              onChange={updateBooking}
+              onNext={nextStep}
+              onBack={prevStep}
+            />
+          )}
           {step === 'guest-details' && (
             <StepGuestDetails
+              booking={booking}
+              onChange={updateBooking}
+              onNext={nextStep}
+              onBack={prevStep}
+            />
+          )}
+          {step === 'otp' && (
+            <StepOtp
               booking={booking}
               restaurantId={restaurantId}
               onChange={updateBooking}

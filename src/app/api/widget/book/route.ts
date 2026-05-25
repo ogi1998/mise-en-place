@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { createAnonSupabaseClient } from "@/lib/supabase-anon";
 import {
   createGuest,
@@ -42,7 +43,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const supabase = await createAnonSupabaseClient();
+  const token = req.headers.get("Authorization")?.replace("Bearer ", "")
+  if (!token) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  // Verify the JWT to get the authenticated user's ID
+  const authClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } },
+  );
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  // Use anon client for DB operations — existing anon RLS policies cover these
+  const supabase = createAnonSupabaseClient();
 
   const rules = await getBookingRules(supabase, service_area_id);
   if (!rules)
@@ -99,6 +117,7 @@ export async function POST(req: NextRequest) {
     email,
     phone,
     allergens: allergens || [],
+    auth_user_id: user.id,
   });
   if (!guest)
     return NextResponse.json(

@@ -5,14 +5,15 @@ import { ChevronLeft } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { supabaseWidget } from '@/lib/supabase-widget'
 import type { BookingState } from '../BookingWidget'
 
 const guestSchema = z.object({
   firstName: z.string().min(1, 'Required'),
-  lastName: z.string().min(1, 'Required'),
-  email: z.string().email('Invalid email'),
-  phone: z.string().min(6, 'Invalid phone'),
-  notes: z.string().optional(),
+  lastName:  z.string().min(1, 'Required'),
+  email:     z.string().email('Invalid email'),
+  phone:     z.string().min(6, 'Invalid phone'),
+  notes:     z.string().optional(),
 })
 
 type GuestFormData = z.infer<typeof guestSchema>
@@ -24,13 +25,12 @@ const ALLERGEN_OPTIONS = [
 
 type Props = {
   booking: BookingState
-  restaurantId: string
   onChange: (updates: Partial<BookingState>) => void
   onNext: () => void
   onBack: () => void
 }
 
-export default function StepGuestDetails({ booking, restaurantId, onChange, onNext, onBack }: Props) {
+export default function StepGuestDetails({ booking, onChange, onNext, onBack }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
@@ -38,18 +38,17 @@ export default function StepGuestDetails({ booking, restaurantId, onChange, onNe
     resolver: zodResolver(guestSchema),
     defaultValues: {
       firstName: booking.firstName,
-      lastName: booking.lastName,
-      email: booking.email,
-      phone: booking.phone,
-      notes: booking.notes,
+      lastName:  booking.lastName,
+      email:     booking.email,
+      phone:     booking.phone,
+      notes:     booking.notes,
     },
   })
 
   function toggleAllergen(allergen: string) {
-    const current = booking.allergens
-    const next = current.includes(allergen)
-      ? current.filter(a => a !== allergen)
-      : [...current, allergen]
+    const next = booking.allergens.includes(allergen)
+      ? booking.allergens.filter(a => a !== allergen)
+      : [...booking.allergens, allergen]
     onChange({ allergens: next })
   }
 
@@ -59,44 +58,19 @@ export default function StepGuestDetails({ booking, restaurantId, onChange, onNe
 
     onChange({
       firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      notes: data.notes ?? '',
+      lastName:  data.lastName,
+      email:     data.email,
+      phone:     data.phone,
+      notes:     data.notes ?? '',
     })
 
-    try {
-      const res = await fetch('/api/widget/book', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          restaurant_id: restaurantId,
-          service_area_id: booking.serviceAreaId,
-          party_size: booking.partySize,
-          booking_date: booking.date,
-          slot_time: booking.slot,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          notes: data.notes || null,
-          allergens: booking.allergens,
-        }),
-      })
-
-      const json = await res.json()
-
-      if (!res.ok) {
-        setSubmitError(json.error ?? 'Something went wrong. Please try again.')
-      } else {
-        onChange({ bookingId: json.bookingId })
-        onNext()
-      }
-    } catch {
-      setSubmitError('Network error. Please try again.')
-    }
-
+    const { error: err } = await supabaseWidget.auth.signInWithOtp({ email: data.email })
     setSubmitting(false)
+    if (err) {
+      setSubmitError(err.message)
+    } else {
+      onNext()
+    }
   }
 
   return (
@@ -163,7 +137,6 @@ export default function StepGuestDetails({ booking, restaurantId, onChange, onNe
         </div>
       </div>
 
-      {/* Allergens */}
       <div>
         <label className="block text-xs font-medium text-[#7a7060] mb-2">
           Allergens <span className="text-[#a09880] font-normal">(optional)</span>
@@ -196,7 +169,7 @@ export default function StepGuestDetails({ booking, restaurantId, onChange, onNe
         disabled={submitting}
         className="w-full py-3 bg-[#1a1a18] text-[#f5f0e8] rounded-xl text-sm font-medium hover:bg-[#2a2a26] disabled:opacity-50 transition-colors"
       >
-        {submitting ? 'Confirming…' : 'Confirm booking'}
+        {submitting ? 'Sending…' : 'Send confirmation code'}
       </button>
     </div>
   )
