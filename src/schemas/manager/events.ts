@@ -7,7 +7,7 @@ export const eventSchema = z.object({
   time_end: z.string().min(1, 'End time is required'),
   capacity: z.number().int().min(1).nullable(),
   is_public: z.boolean(),
-  locked_area_ids: z.array(z.string()).default([]),
+  locked_area_ids: z.array(z.string()),
 })
 
 export type EventFormData = z.infer<typeof eventSchema>
