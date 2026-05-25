@@ -8,7 +8,7 @@ export async function getFloorPlanTables(
 ): Promise<FloorPlanTable[]> {
   const { data } = await supabase
     .from('tables')
-    .select('id, name, nickname, min_seats, seats, max_seats, sort_order')
+    .select('id, name, nickname, shape, min_seats, seats, max_seats, sort_order, floor_plan_x, floor_plan_y, floor_plan_rotation')
     .eq('restaurant_id', restaurantId)
     .eq('service_area_id', areaId)
     .eq('is_active', true)
@@ -54,6 +54,29 @@ export async function getFloorPlanBookings(
     ...(b as unknown as Omit<FloorPlanBooking, 'table_ids'>),
     table_ids: tableMap[b.id] ?? [],
   }))
+}
+
+export async function updateTablePosition(
+  supabase: SupabaseClient,
+  tableId: string,
+  x: number,
+  y: number,
+  rotation: number
+): Promise<void> {
+  await supabase
+    .from('tables')
+    .update({ floor_plan_x: x, floor_plan_y: y, floor_plan_rotation: rotation })
+    .eq('id', tableId)
+}
+
+export async function clearTablePosition(
+  supabase: SupabaseClient,
+  tableId: string
+): Promise<void> {
+  await supabase
+    .from('tables')
+    .update({ floor_plan_x: null, floor_plan_y: null, floor_plan_rotation: null })
+    .eq('id', tableId)
 }
 
 export async function assignBookingToTable(
