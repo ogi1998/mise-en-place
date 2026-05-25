@@ -111,11 +111,53 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // For each slot check if at least one table is free
+  // 6. Fetch events for this date and pre-compute capacity usage
+  const { data: dayEvents } = await supabase
+    .from('events')
+    .select('id, time_start, time_end, capacity, locked_area_ids')
+    .eq('restaurant_id', restaurantId)
+    .eq('date', date)
+
+  const eventCapacityUsed: Record<string, number> = {}
+  for (const event of dayEvents ?? []) {
+    if (event.capacity === null) continue
+    const { data: overlapping } = await supabase
+      .from('bookings')
+      .select('party_size')
+      .eq('restaurant_id', restaurantId)
+      .eq('booking_date', date)
+      .not('status', 'in', '("cancelled","no_show")')
+      .lt('start_time', event.time_end)
+      .gt('end_time', event.time_start)
+    eventCapacityUsed[event.id] = (overlapping ?? []).reduce(
+      (sum: number, b: { party_size: number }) => sum + b.party_size,
+      0,
+    )
+  }
+
+  // For each slot check table availability + event constraints
   const availableSlots = rawSlots.filter(slot => {
     const slotStartMin = timeToMinutes(slot)
     const slotEndMin = slotStartMin + rules.booking_duration
-    return tables.some(table => isTableFree(table.id, slotStartMin, slotEndMin, bookingsByTable))
+
+    if (!tables.some(table => isTableFree(table.id, slotStartMin, slotEndMin, bookingsByTable))) {
+      return false
+    }
+
+    for (const event of dayEvents ?? []) {
+      const eventStartMin = timeToMinutes(event.time_start.slice(0, 5))
+      const eventEndMin = timeToMinutes(event.time_end.slice(0, 5))
+      if (slotStartMin >= eventEndMin || slotEndMin <= eventStartMin) continue
+
+      if ((event.locked_area_ids ?? []).includes(serviceAreaId)) return false
+
+      if (event.capacity !== null) {
+        const used = eventCapacityUsed[event.id] ?? 0
+        if (used + partySize > event.capacity) return false
+      }
+    }
+
+    return true
   })
 
   return NextResponse.json({ slots: availableSlots })

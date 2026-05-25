@@ -7,6 +7,7 @@ type TimetableHeaderProps = {
   onDateChange: (date: string) => void
   specialDayLabel?: string
   isClosed?: boolean
+  eventNames?: string[]
 }
 
 function offsetDate(date: string, days: number): string {
@@ -28,7 +29,7 @@ function isToday(date: string): boolean {
   return date === new Date().toISOString().split('T')[0]
 }
 
-export default function TimetableHeader({ date, onDateChange, specialDayLabel, isClosed }: TimetableHeaderProps) {
+export default function TimetableHeader({ date, onDateChange, specialDayLabel, isClosed, eventNames }: TimetableHeaderProps) {
   return (
     <div className="flex h-12 shrink-0 items-center gap-3 border-b border-black/6 bg-white px-6">
       <button
@@ -56,6 +57,12 @@ export default function TimetableHeader({ date, onDateChange, specialDayLabel, i
             : 'bg-amber-50 text-amber-700'
         }`}>
           {isClosed ? `Closed · ${specialDayLabel}` : `Modified hours · ${specialDayLabel}`}
+        </span>
+      )}
+
+      {eventNames && eventNames.length > 0 && (
+        <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-blue-50 text-blue-700">
+          {eventNames.length === 1 ? eventNames[0] : `${eventNames.length} events`}
         </span>
       )}
 

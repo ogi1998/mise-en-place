@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { WidgetRestaurant, WidgetServiceArea } from "./types";
+import type { WidgetRestaurant, WidgetServiceArea, WidgetEvent } from "./types";
 
 export async function getRestaurantBySlug(
   supabase: SupabaseClient,
@@ -24,6 +24,22 @@ export async function getActiveServiceAreas(
     .eq("is_active", true)
     .order("sort_order");
   return (data ?? []) as WidgetServiceArea[];
+}
+
+export async function getUpcomingPublicEvents(
+  supabase: SupabaseClient,
+  restaurantId: string,
+): Promise<WidgetEvent[]> {
+  const today = new Date().toISOString().split('T')[0]
+  const { data } = await supabase
+    .from('events')
+    .select('id, name, date, time_start, time_end, capacity, cover_image')
+    .eq('restaurant_id', restaurantId)
+    .eq('is_public', true)
+    .gte('date', today)
+    .order('date', { ascending: true })
+    .order('time_start', { ascending: true })
+  return (data ?? []) as WidgetEvent[]
 }
 
 export async function getWeeklySchedule(

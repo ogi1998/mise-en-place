@@ -15,6 +15,7 @@ type Props = {
   year: number
   month: number
   counts: Record<string, DayCount>
+  eventDates?: string[]
 }
 
 type HeatLevel = 0 | 1 | 2 | 3 | 4
@@ -52,7 +53,8 @@ const HEAT_SUBTEXT: Record<HeatLevel, string> = {
   4: 'text-emerald-800',
 }
 
-export default function CalendarGrid({ year, month, counts }: Props) {
+export default function CalendarGrid({ year, month, counts, eventDates = [] }: Props) {
+  const eventDateSet = new Set(eventDates)
   const router = useRouter()
 
   const today = new Date()
@@ -123,6 +125,7 @@ export default function CalendarGrid({ year, month, counts }: Props) {
 
           const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
           const dayData = counts[dateStr]
+          const hasEvent = eventDateSet.has(dateStr)
           const isToday = dateStr === todayStr
           const isWeekend = (idx % 7) >= 5
           const level = dayData ? heatLevel(dayData.bookings, maxBookings) : 0
@@ -151,6 +154,13 @@ export default function CalendarGrid({ year, month, counts }: Props) {
                   <p className={`text-[11px] font-medium ${HEAT_SUBTEXT[level]}`}>
                     {dayData.covers} {dayData.covers === 1 ? 'cover' : 'covers'}
                   </p>
+                </div>
+              )}
+              {hasEvent && (
+                <div className="mt-1">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#dbeafe] text-[#1d4ed8]">
+                    Event
+                  </span>
                 </div>
               )}
             </button>

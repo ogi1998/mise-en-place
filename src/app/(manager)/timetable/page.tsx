@@ -5,6 +5,7 @@ import {
   getDaySchedule,
   getTimetableTables
 } from '@/services/manager/timetable/queries';
+import { getEventsForDate } from '@/services/manager/events/queries';
 import TimetableShell from '@/components/manager/timetable/TimetableShell';
 import { FALLBACK_SCHEDULE } from '@/services/manager/timetable/types';
 
@@ -17,9 +18,10 @@ export default async function TimetablePage({ searchParams }: Props) {
   const initialDate = dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam) ? dateParam : todayDate
 
   const areas = await getTimetableAreas(supabase, restaurantId);
-  const bookings = areas.length
-    ? await getTimetableBookings(supabase, restaurantId, initialDate)
-    : [];
+  const [bookings, initialEvents] = await Promise.all([
+    areas.length ? getTimetableBookings(supabase, restaurantId, initialDate) : Promise.resolve([]),
+    getEventsForDate(supabase, restaurantId, initialDate),
+  ]);
 
   const initialAreaData = await Promise.all(
     areas.map(async area => {
@@ -42,6 +44,7 @@ export default async function TimetablePage({ searchParams }: Props) {
       initialAreas={areas}
       initialAreaData={initialAreaData}
       initialBookings={bookings}
+      initialEvents={initialEvents}
     />
   );
 }

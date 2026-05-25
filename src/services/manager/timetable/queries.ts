@@ -109,7 +109,7 @@ export async function getDaySchedule(
 		.eq('service_area_id', areaId)
 		.eq('day_of_week', dbDay)
 		.eq('is_open', true)
-		.single();
+		.maybeSingle();
 
 	if (!data) return CLOSED_SCHEDULE
 
