@@ -4,10 +4,14 @@ export type FloorPlanTable = {
   id: string
   name: string
   nickname: string | null
+  shape: 'circle' | 'rectangle' | 'square'
   min_seats: number
   seats: number
   max_seats: number
   sort_order: number
+  floor_plan_x: number | null
+  floor_plan_y: number | null
+  floor_plan_rotation: number | null
 }
 
 export type FloorPlanBooking = {
