@@ -113,7 +113,12 @@ export default function TimetableShell({
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <TimetableHeader date={date} onDateChange={handleDateChange} />
+      <TimetableHeader
+        date={date}
+        onDateChange={handleDateChange}
+        specialDayLabel={areaData[0]?.schedule.special_day_label}
+        isClosed={areaData[0]?.schedule.is_closed}
+      />
       <AreaTabs
         areas={initialAreas}
         activeAreaIds={activeAreaIds}

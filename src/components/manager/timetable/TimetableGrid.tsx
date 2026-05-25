@@ -50,6 +50,14 @@ export default function TimetableGrid({ tables, bookings, schedule, date, onBook
 	const assignedBookings = bookings.filter((b) => b.table_ids.length > 0);
 	const unassignedBookings = bookings.filter((b) => b.table_ids.length === 0);
 
+	if (schedule.is_closed) {
+		return (
+			<div className='flex h-full items-center justify-center bg-[#faf9f6]'>
+				<p className='text-sm text-[#a09880]'>Closed on this date</p>
+			</div>
+		)
+	}
+
 	return (
 		<div className='flex h-full flex-col overflow-hidden bg-[#faf9f6]'>
 			<div className='flex flex-1 overflow-hidden'>
