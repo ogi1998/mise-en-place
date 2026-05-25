@@ -1,8 +1,11 @@
 'use client'
 
+import { Controller } from 'react-hook-form'
 import type { UseFormReturn } from 'react-hook-form'
 import type { SpecialDayFormData } from '@/schemas/manager/settings/special-days'
 import { SLOT_INTERVAL_OPTIONS } from '@/services/manager/settings/weekly-schedule/utils'
+import DatePicker from '@/components/ui/DatePicker'
+import TimePicker from '@/components/ui/TimePicker'
 
 type Props = {
   form: UseFormReturn<SpecialDayFormData>
@@ -13,7 +16,7 @@ type Props = {
 }
 
 export default function SpecialDayForm({ form, saving, error, onSave, onCancel }: Props) {
-  const { register, handleSubmit, watch, formState: { errors } } = form
+  const { register, handleSubmit, watch, control, formState: { errors } } = form
   const type = watch('type')
 
   return (
@@ -31,10 +34,17 @@ export default function SpecialDayForm({ form, saving, error, onSave, onCancel }
 
         <div>
           <label className="block text-xs font-medium text-[#7a7060] mb-1">Date</label>
-          <input
-            type="date"
-            {...register('date')}
-            className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
+          <Controller
+            control={control}
+            name="date"
+            render={({ field }) => (
+              <DatePicker
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                hasError={!!errors.date}
+                theme="manager"
+              />
+            )}
           />
           {errors.date && <p className="mt-1 text-xs text-red-500">{errors.date.message}</p>}
         </div>
@@ -56,27 +66,45 @@ export default function SpecialDayForm({ form, saving, error, onSave, onCancel }
         <div className="grid grid-cols-2 gap-4 pt-2 border-t border-[#e8e4dc]">
           <div>
             <label className="block text-xs font-medium text-[#7a7060] mb-1">Open time</label>
-            <input type="time" {...register('open_time')}
-              className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]" />
+            <Controller
+              control={control}
+              name="open_time"
+              render={({ field }) => (
+                <TimePicker value={field.value ?? ''} onChange={field.onChange} hasError={!!errors.open_time} />
+              )}
+            />
             {errors.open_time && <p className="mt-1 text-xs text-red-500">{errors.open_time.message}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-[#7a7060] mb-1">Close time</label>
-            <input type="time" {...register('close_time')}
-              className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]" />
+            <Controller
+              control={control}
+              name="close_time"
+              render={({ field }) => (
+                <TimePicker value={field.value ?? ''} onChange={field.onChange} hasError={!!errors.close_time} />
+              )}
+            />
             {errors.close_time && <p className="mt-1 text-xs text-red-500">{errors.close_time.message}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-[#7a7060] mb-1">Pause from <span className="text-[#a09880] font-normal">(optional)</span></label>
-            <input type="time" {...register('pause_from')}
-              className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]" />
-            {errors.pause_from && <p className="mt-1 text-xs text-red-500">{errors.pause_from.message}</p>}
+            <Controller
+              control={control}
+              name="pause_from"
+              render={({ field }) => (
+                <TimePicker value={field.value ?? ''} onChange={field.onChange} placeholder="None" />
+              )}
+            />
           </div>
           <div>
             <label className="block text-xs font-medium text-[#7a7060] mb-1">Pause to <span className="text-[#a09880] font-normal">(optional)</span></label>
-            <input type="time" {...register('pause_to')}
-              className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]" />
-            {errors.pause_to && <p className="mt-1 text-xs text-red-500">{errors.pause_to.message}</p>}
+            <Controller
+              control={control}
+              name="pause_to"
+              render={({ field }) => (
+                <TimePicker value={field.value ?? ''} onChange={field.onChange} placeholder="None" />
+              )}
+            />
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-medium text-[#7a7060] mb-1">Slot interval</label>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ChevronLeft } from 'lucide-react'
+import DatePicker from '@/components/ui/DatePicker'
 import type { BookingState } from '../BookingWidget'
 
 type Props = {
@@ -18,7 +19,6 @@ export default function StepDateTime({ booking, restaurantId, onChange, onNext, 
   const [closed, setClosed] = useState(false)
   const [error, setError] = useState('')
 
-  // Min date = today, max date handled by API
   const today = new Date().toISOString().split('T')[0]
 
   useEffect(() => {
@@ -63,19 +63,17 @@ export default function StepDateTime({ booking, restaurantId, onChange, onNext, 
         </div>
       </div>
 
-      {/* Date picker */}
       <div>
         <label className="block text-xs font-medium text-[#7a7060] mb-1.5">Date</label>
-        <input
-          type="date"
-          min={today}
+        <DatePicker
           value={booking.date}
-          onChange={e => onChange({ date: e.target.value })}
-          className="w-full px-3 py-2.5 text-sm border border-[#e8e4dc] rounded-xl bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
+          onChange={(date) => onChange({ date })}
+          min={today}
+          placeholder="Select a date"
+          theme="widget"
         />
       </div>
 
-      {/* Slots */}
       {booking.date && (
         <div>
           <label className="block text-xs font-medium text-[#7a7060] mb-1.5">Available times</label>
