@@ -193,11 +193,11 @@ export async function createBooking(
     status: "pending";
     source: "online";
   },
-): Promise<{ id: string } | null> {
+): Promise<{ id: string; booking_number: string } | null> {
   const { data } = await supabase
     .from("bookings")
     .insert(payload)
-    .select("id")
+    .select("id, booking_number")
     .single();
   return data;
 }

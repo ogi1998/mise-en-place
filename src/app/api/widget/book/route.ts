@@ -8,6 +8,7 @@ import {
   getTablesForArea,
   getExistingBookings,
 } from "@/services/widget/queries";
+import { sendBookingConfirmation } from "@/lib/sendgrid";
 import {
   getBookingWindows,
   isTableFree,
@@ -150,6 +151,23 @@ export async function POST(req: NextRequest) {
     table_id: freeTable.id,
     restaurant_id,
   });
+
+  // Send confirmation email — fire and forget, don't fail the booking if email errors
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("name")
+    .eq("id", restaurant_id)
+    .single();
+
+  sendBookingConfirmation({
+    to: email,
+    firstName: first_name,
+    restaurantName: restaurant?.name ?? 'the restaurant',
+    date: booking_date,
+    slot: slot_time,
+    partySize: party_size,
+    bookingNumber: booking.booking_number,
+  }).catch(err => console.error('[sendBookingConfirmation]', err));
 
   return NextResponse.json({ success: true, bookingId: booking.id });
 }
