@@ -6,7 +6,7 @@ export async function getBookingsForDate(
   restaurantId: string,
   date: string
 ): Promise<BookingListItem[]> {
-  const { data: bookings } = await supabase
+  const { data: bookings, error } = await supabase
     .from('bookings')
     .select(`
       id, booking_number, status, source, party_size,
@@ -19,6 +19,7 @@ export async function getBookingsForDate(
     .eq('booking_date', date)
     .order('start_time')
 
+  if (error) console.error('[getBookingsForDate]', error)
   if (!bookings?.length) return []
 
   const bookingIds = bookings.map(b => b.id)

@@ -40,6 +40,18 @@ export type ProfileWithRestaurant = {
 export type BookingStatus = 'pending' | 'confirmed' | 'seated' | 'completed' | 'cancelled' | 'no_show'
 export type BookingSource = 'online' | 'walk_in' | 'phone' | 'manual'
 
+export interface Guest {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  phone: string | null
+  allergens: string[] | null
+  auth_user_id: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Booking {
   id: string
   restaurant_id: string

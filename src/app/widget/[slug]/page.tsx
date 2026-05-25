@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { getRestaurantBySlug, getActiveServiceAreas } from '@/services/widget/queries'
-import BookingWidget from '@/components/widget/BookingWidget'
 import { notFound } from 'next/navigation'
+import BookingWidgetLoader from '@/components/widget/BookingWidgetLoader'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -17,7 +17,7 @@ export default async function WidgetPage({ params }: Props) {
   const serviceAreas = await getActiveServiceAreas(supabase, restaurant.id)
 
   return (
-    <BookingWidget
+    <BookingWidgetLoader
       restaurantId={restaurant.id}
       restaurantName={restaurant.name}
       serviceAreas={serviceAreas}
