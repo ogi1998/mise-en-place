@@ -7,7 +7,8 @@ import StepOtp from '@/components/widget/steps/StepOtp'
 import StepLookup from '@/components/widget/steps/StepLookup'
 import StepGuestDetails from '@/components/widget/steps/StepGuestDetails'
 import StepConfirmation from '@/components/widget/steps/StepConfirmation'
-import type { WidgetServiceArea } from '@/services/widget/types'
+import EventsSection from '@/components/widget/EventsSection'
+import type { WidgetServiceArea, WidgetEvent } from '@/services/widget/types'
 
 type Step = 'party-size' | 'datetime' | 'lookup' | 'guest-details' | 'otp' | 'confirmation'
 
@@ -56,9 +57,10 @@ type Props = {
   restaurantId: string
   restaurantName: string
   serviceAreas: WidgetServiceArea[]
+  events: WidgetEvent[]
 }
 
-export default function BookingWidget({ restaurantId, restaurantName, serviceAreas }: Props) {
+export default function BookingWidget({ restaurantId, restaurantName, serviceAreas, events }: Props) {
   const [step, setStep] = useState<Step>('party-size')
   const [booking, setBooking] = useState<BookingState>({
     ...INITIAL_STATE,
@@ -79,6 +81,11 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
     if (idx > 0) setStep(STEPS[idx - 1])
   }
 
+  function handleBookEvent(date: string) {
+    updateBooking({ date })
+    setStep('datetime')
+  }
+
   const stepIndex = STEPS.indexOf(step)
   const isConfirmed = step === 'confirmation' && booking.bookingId !== null
   const displayedSteps = STEPS.filter((s) => s !== 'confirmation')
@@ -97,6 +104,11 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
           </h1>
           <p className="text-sm text-[#7a7060] mt-1">Reserve a table</p>
         </div>
+
+        {/* Public events */}
+        {step === 'party-size' && (
+          <EventsSection events={events} onBookEvent={handleBookEvent} />
+        )}
 
         {/* Step indicator */}
         {!isConfirmed && (

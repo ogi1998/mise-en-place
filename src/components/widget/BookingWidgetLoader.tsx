@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import type { WidgetServiceArea } from '@/services/widget/types'
+import type { WidgetServiceArea, WidgetEvent } from '@/services/widget/types'
 
 const BookingWidget = dynamic(() => import('./BookingWidget'), {
   ssr: false,
@@ -19,6 +19,7 @@ type Props = {
   restaurantId: string
   restaurantName: string
   serviceAreas: WidgetServiceArea[]
+  events: WidgetEvent[]
 }
 
 export default function BookingWidgetLoader(props: Props) {

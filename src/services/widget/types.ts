@@ -36,3 +36,13 @@ export type GuestPayload = {
   email: string
   phone: string
 }
+
+export type WidgetEvent = {
+  id: string
+  name: string
+  date: string
+  time_start: string
+  time_end: string
+  capacity: number | null
+  cover_image: string | null
+}

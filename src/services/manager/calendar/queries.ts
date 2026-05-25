@@ -2,6 +2,26 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 export type DayCount = { bookings: number; covers: number }
 
+export async function getMonthEventDates(
+  supabase: SupabaseClient,
+  restaurantId: string,
+  year: number,
+  month: number
+): Promise<string[]> {
+  const from = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate()
+  const to = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+
+  const { data } = await supabase
+    .from('events')
+    .select('date')
+    .eq('restaurant_id', restaurantId)
+    .gte('date', from)
+    .lte('date', to)
+
+  return (data ?? []).map(r => r.date as string)
+}
+
 export async function getMonthBookingCounts(
   supabase: SupabaseClient,
   restaurantId: string,

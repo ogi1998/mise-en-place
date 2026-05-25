@@ -13,6 +13,9 @@ import {
   getTimetableTables,
   getDaySchedule,
 } from "@/services/manager/timetable/queries";
+import { getEventsForDate } from "@/services/manager/events/queries";
+import type { Event } from "@/services/manager/events/types";
+
 import { FALLBACK_SCHEDULE } from "@/services/manager/timetable/types";
 import TimetableHeader from "@/components/manager/timetable/TimetableHeader";
 import AreaTabs from "@/components/manager/ui/AreaTabs";
@@ -31,6 +34,7 @@ type TimetableShellProps = {
   initialAreas: TimetableArea[];
   initialAreaData: AreaData[];
   initialBookings: TimetableBooking[];
+  initialEvents: Event[];
 };
 
 export default function TimetableShell({
@@ -39,6 +43,7 @@ export default function TimetableShell({
   initialAreas,
   initialAreaData,
   initialBookings,
+  initialEvents,
 }: TimetableShellProps) {
   const [date, setDate] = useState(initialDate);
   const [activeAreaIds, setActiveAreaIds] = useState<string[]>(
@@ -46,6 +51,7 @@ export default function TimetableShell({
   );
   const [areaData, setAreaData] = useState<AreaData[]>(initialAreaData);
   const [bookings, setBookings] = useState(initialBookings);
+  const [dayEvents, setDayEvents] = useState<Event[]>(initialEvents);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] =
     useState<TimetableBooking | null>(null);
@@ -54,8 +60,9 @@ export default function TimetableShell({
     async (newDate: string, areaIds: string[]) => {
       setIsLoading(true);
       try {
-        const [newBookings, ...areaResults] = await Promise.all([
+        const [newBookings, newEvents, ...areaResults] = await Promise.all([
           getTimetableBookings(supabase, restaurantId, newDate),
+          getEventsForDate(supabase, restaurantId, newDate),
           ...areaIds.map((areaId) =>
             Promise.all([
               getTimetableTables(supabase, restaurantId, areaId),
@@ -65,6 +72,7 @@ export default function TimetableShell({
         ]);
 
         setBookings(newBookings as TimetableBooking[]);
+        setDayEvents(newEvents as Event[]);
         setAreaData(
           areaIds.map((areaId, i) => {
             const [tables, schedule] = areaResults[i] as [
@@ -118,6 +126,13 @@ export default function TimetableShell({
         onDateChange={handleDateChange}
         specialDayLabel={areaData[0]?.schedule.special_day_label}
         isClosed={areaData[0]?.schedule.is_closed}
+        eventNames={dayEvents.map((e) => {
+          const lockedNames = (e.locked_area_ids ?? [])
+            .map((id) => initialAreas.find((a) => a.id === id)?.name)
+            .filter(Boolean)
+            .join(', ')
+          return `${e.name} · ${e.time_start.slice(0, 5)}–${e.time_end.slice(0, 5)}${lockedNames ? ` · Locks: ${lockedNames}` : ''}`
+        })}
       />
       <AreaTabs
         areas={initialAreas}

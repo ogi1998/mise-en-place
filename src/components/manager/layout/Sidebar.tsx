@@ -12,6 +12,7 @@ import {
   Ticket,
   Settings,
   LogOut,
+  Sparkles,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
@@ -23,6 +24,7 @@ const NAV_SECTIONS = [
       { href: "/timetable", label: "Timetable", icon: "timetable" },
       { href: "/floor-plan", label: "Floor Plan", icon: "floorplan" },
       { href: "/calendar", label: "Calendar", icon: "calendar" },
+      { href: "/events", label: "Events", icon: "events" },
       { href: "/bookings", label: "Bookings", icon: "bookings" },
     ],
   },
@@ -41,6 +43,7 @@ const icons: Record<string, React.ElementType> = {
   timetable: CalendarRange,
   floorplan: Map,
   calendar: Calendar,
+  events: Sparkles,
   bookings: BookOpen,
   guests: Users,
   vouchers: Ticket,
