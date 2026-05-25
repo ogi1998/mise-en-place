@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { TimetableArea, TimetableTable, TimetableBooking, DaySchedule } from './types';
-import { FALLBACK_SCHEDULE } from './types';
+import { FALLBACK_SCHEDULE, CLOSED_SCHEDULE } from './types';
 
 export async function getTimetableAreas(supabase: SupabaseClient, restaurantId: string): Promise<TimetableArea[]> {
 	const { data } = await supabase
@@ -76,6 +76,29 @@ export async function getDaySchedule(
 	areaId: string,
 	date: string
 ): Promise<DaySchedule> {
+	// Check special days first (restaurant-wide, no service_area_id)
+	const { data: specialDay } = await supabase
+		.from('special_days')
+		.select('type, name, open_time, close_time, pause_from, pause_to')
+		.eq('restaurant_id', restaurantId)
+		.eq('date', date)
+		.is('service_area_id', null)
+		.maybeSingle()
+
+	if (specialDay) {
+		if (specialDay.type === 'closed') return { ...CLOSED_SCHEDULE, special_day_label: specialDay.name }
+		if (specialDay.type === 'modified') {
+			return {
+				open_time: specialDay.open_time ?? FALLBACK_SCHEDULE.open_time,
+				close_time: specialDay.close_time ?? FALLBACK_SCHEDULE.close_time,
+				pause_from: specialDay.pause_from ?? null,
+				pause_to: specialDay.pause_to ?? null,
+				special_day_label: specialDay.name,
+			}
+		}
+		// type === 'open' — fall through to weekly schedule
+	}
+
 	const jsDay = new Date(date).getDay();
 	const dbDay = jsDay === 0 ? 7 : jsDay;
 
@@ -88,5 +111,7 @@ export async function getDaySchedule(
 		.eq('is_open', true)
 		.single();
 
-	return (data as DaySchedule | null) ?? FALLBACK_SCHEDULE;
+	if (!data) return CLOSED_SCHEDULE
+
+	return data as DaySchedule
 }

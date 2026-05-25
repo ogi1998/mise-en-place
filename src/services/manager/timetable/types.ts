@@ -40,6 +40,8 @@ export type DaySchedule = {
   close_time: string
   pause_from: string | null
   pause_to: string | null
+  is_closed?: boolean
+  special_day_label?: string
 }
 
 export const FALLBACK_SCHEDULE: DaySchedule = {
@@ -47,4 +49,12 @@ export const FALLBACK_SCHEDULE: DaySchedule = {
   close_time: '23:00',
   pause_from: null,
   pause_to: null,
+}
+
+export const CLOSED_SCHEDULE: DaySchedule = {
+  open_time: '10:00',
+  close_time: '23:00',
+  pause_from: null,
+  pause_to: null,
+  is_closed: true,
 }

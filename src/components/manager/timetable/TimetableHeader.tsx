@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react'
 type TimetableHeaderProps = {
   date: string
   onDateChange: (date: string) => void
+  specialDayLabel?: string
+  isClosed?: boolean
 }
 
 function offsetDate(date: string, days: number): string {
@@ -26,7 +28,7 @@ function isToday(date: string): boolean {
   return date === new Date().toISOString().split('T')[0]
 }
 
-export default function TimetableHeader({ date, onDateChange }: TimetableHeaderProps) {
+export default function TimetableHeader({ date, onDateChange, specialDayLabel, isClosed }: TimetableHeaderProps) {
   return (
     <div className="flex h-12 shrink-0 items-center gap-3 border-b border-black/6 bg-white px-6">
       <button
@@ -46,6 +48,16 @@ export default function TimetableHeader({ date, onDateChange }: TimetableHeaderP
       <p className="text-[13px] font-medium capitalize text-[#1a1a18]">
         {formatDate(date)}
       </p>
+
+      {specialDayLabel && (
+        <span className={`px-2 py-0.5 rounded-md text-[11px] font-medium ${
+          isClosed
+            ? 'bg-red-50 text-red-600'
+            : 'bg-amber-50 text-amber-700'
+        }`}>
+          {isClosed ? `Closed · ${specialDayLabel}` : `Modified hours · ${specialDayLabel}`}
+        </span>
+      )}
 
       {!isToday(date) && (
         <button
