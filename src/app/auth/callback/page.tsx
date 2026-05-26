@@ -8,17 +8,23 @@ import { supabaseWidget as supabase } from '@/lib/supabase-widget'
 // notify the opener, then close.
 export default function AuthCallbackPage() {
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event) => {
-        if (event === 'SIGNED_IN' && window.opener) {
-          window.opener.postMessage(
-            { type: 'SUPABASE_AUTH_COMPLETE' },
-            window.location.origin,
-          )
-          window.close()
-        }
-      },
-    )
+    function notify() {
+      if (window.opener) {
+        window.opener.postMessage({ type: 'SUPABASE_AUTH_COMPLETE' }, window.location.origin)
+        window.close()
+      }
+    }
+
+    // Listen for the sign-in event (implicit flow processes the hash on load)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') notify()
+    })
+
+    // Fallback: session may already exist if the event fired before the listener was ready
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) notify()
+    })
+
     return () => subscription.unsubscribe()
   }, [])
 

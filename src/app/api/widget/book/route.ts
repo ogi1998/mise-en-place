@@ -8,7 +8,7 @@ import {
   getTablesForArea,
   getExistingBookings,
 } from "@/services/widget/queries";
-import { sendBookingConfirmation } from "@/lib/sendgrid";
+import { sendBookingConfirmation } from "@/lib/resend";
 import {
   getBookingWindows,
   isTableFree,

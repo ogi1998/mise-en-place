@@ -44,7 +44,11 @@ export type WidgetTranslations = {
   details_email: string
   details_phone: string
   details_notes: string
+  details_dietary: string
   details_allergens: string
+  details_allergens_note: string
+  dietary_labels: Record<string, string>
+  allergen_labels: Record<string, string>
   details_sending: string
   details_send_code: string
 
@@ -102,7 +106,19 @@ const en: WidgetTranslations = {
   details_email: 'Email',
   details_phone: 'Phone',
   details_notes: 'Special requests',
-  details_allergens: 'Allergens',
+  details_dietary: 'Dietary preferences',
+  details_allergens: 'Allergens & intolerances',
+  details_allergens_note: 'Only tick if you have a diagnosed allergy or intolerance',
+  dietary_labels: {
+    Vegetarian: 'Vegetarian', Vegan: 'Vegan', Pescatarian: 'Pescatarian',
+    Halal: 'Halal', Kosher: 'Kosher',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Crustaceans', Eggs: 'Eggs', Fish: 'Fish',
+    Peanuts: 'Peanuts', Soybeans: 'Soybeans', 'Milk/Lactose': 'Milk/Lactose',
+    'Tree nuts': 'Tree nuts', Celery: 'Celery', Mustard: 'Mustard',
+    Sesame: 'Sesame', Sulphites: 'Sulphites', Lupin: 'Lupin', Molluscs: 'Molluscs',
+  },
   details_sending: 'Sending…',
   details_send_code: 'Send confirmation code',
   otp_title: 'Confirm booking',
@@ -156,7 +172,19 @@ const sl: WidgetTranslations = {
   details_email: 'E-pošta',
   details_phone: 'Telefon',
   details_notes: 'Posebne zahteve',
-  details_allergens: 'Alergeni',
+  details_dietary: 'Prehranske preference',
+  details_allergens: 'Alergeni in intolerance',
+  details_allergens_note: 'Označite samo, če imate diagnosticirano alergijo ali intoleranco',
+  dietary_labels: {
+    Vegetarian: 'Vegetarijanec', Vegan: 'Vegan', Pescatarian: 'Pescetarijanec',
+    Halal: 'Halal', Kosher: 'Košer',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Raki', Eggs: 'Jajca', Fish: 'Ribe',
+    Peanuts: 'Arašidi', Soybeans: 'Soja', 'Milk/Lactose': 'Mleko/Laktoza',
+    'Tree nuts': 'Lupinarji', Celery: 'Zelena', Mustard: 'Gorčica',
+    Sesame: 'Sezam', Sulphites: 'Žveplov dioksid', Lupin: 'Volčji bob', Molluscs: 'Mehkužci',
+  },
   details_sending: 'Pošiljam…',
   details_send_code: 'Pošlji potrditveno kodo',
   otp_title: 'Potrdi rezervacijo',
@@ -210,7 +238,19 @@ const de: WidgetTranslations = {
   details_email: 'E-Mail',
   details_phone: 'Telefon',
   details_notes: 'Besondere Wünsche',
-  details_allergens: 'Allergene',
+  details_dietary: 'Ernährungspräferenzen',
+  details_allergens: 'Allergene & Unverträglichkeiten',
+  details_allergens_note: 'Nur ankreuzen bei diagnostizierter Allergie oder Unverträglichkeit',
+  dietary_labels: {
+    Vegetarian: 'Vegetarisch', Vegan: 'Vegan', Pescatarian: 'Pescetarisch',
+    Halal: 'Halal', Kosher: 'Koscher',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Krebstiere', Eggs: 'Eier', Fish: 'Fisch',
+    Peanuts: 'Erdnüsse', Soybeans: 'Soja', 'Milk/Lactose': 'Milch/Laktose',
+    'Tree nuts': 'Schalenfrüchte', Celery: 'Sellerie', Mustard: 'Senf',
+    Sesame: 'Sesam', Sulphites: 'Sulfite', Lupin: 'Lupinen', Molluscs: 'Weichtiere',
+  },
   details_sending: 'Wird gesendet…',
   details_send_code: 'Bestätigungscode senden',
   otp_title: 'Buchung bestätigen',
@@ -264,7 +304,19 @@ const it: WidgetTranslations = {
   details_email: 'Email',
   details_phone: 'Telefono',
   details_notes: 'Richieste speciali',
-  details_allergens: 'Allergeni',
+  details_dietary: 'Preferenze alimentari',
+  details_allergens: 'Allergeni e intolleranze',
+  details_allergens_note: 'Selezionare solo in caso di allergia o intolleranza diagnosticata',
+  dietary_labels: {
+    Vegetarian: 'Vegetariano', Vegan: 'Vegano', Pescatarian: 'Pescetariano',
+    Halal: 'Halal', Kosher: 'Kosher',
+  },
+  allergen_labels: {
+    Gluten: 'Glutine', Crustaceans: 'Crostacei', Eggs: 'Uova', Fish: 'Pesce',
+    Peanuts: 'Arachidi', Soybeans: 'Soia', 'Milk/Lactose': 'Latte/Lattosio',
+    'Tree nuts': 'Frutta a guscio', Celery: 'Sedano', Mustard: 'Senape',
+    Sesame: 'Sesamo', Sulphites: 'Solfiti', Lupin: 'Lupini', Molluscs: 'Molluschi',
+  },
   details_sending: 'Invio in corso…',
   details_send_code: 'Invia codice di conferma',
   otp_title: 'Conferma prenotazione',
@@ -318,7 +370,19 @@ const hr: WidgetTranslations = {
   details_email: 'E-mail',
   details_phone: 'Telefon',
   details_notes: 'Posebni zahtjevi',
-  details_allergens: 'Alergeni',
+  details_dietary: 'Prehrambene preferencije',
+  details_allergens: 'Alergeni i intolerance',
+  details_allergens_note: 'Označite samo ako imate dijagnosticiranu alergiju ili intoleranciju',
+  dietary_labels: {
+    Vegetarian: 'Vegetarijanac', Vegan: 'Vegan', Pescatarian: 'Pesketarijanac',
+    Halal: 'Halal', Kosher: 'Košer',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Rakovi', Eggs: 'Jaja', Fish: 'Riba',
+    Peanuts: 'Kikiriki', Soybeans: 'Soja', 'Milk/Lactose': 'Mlijeko/Laktoza',
+    'Tree nuts': 'Orašasti plodovi', Celery: 'Celer', Mustard: 'Gorušica',
+    Sesame: 'Sezam', Sulphites: 'Sulfiti', Lupin: 'Lupina', Molluscs: 'Mekušci',
+  },
   details_sending: 'Slanje…',
   details_send_code: 'Pošalji potvrdni kôd',
   otp_title: 'Potvrdi rezervaciju',
@@ -372,7 +436,19 @@ const fr: WidgetTranslations = {
   details_email: 'E-mail',
   details_phone: 'Téléphone',
   details_notes: 'Demandes spéciales',
-  details_allergens: 'Allergènes',
+  details_dietary: 'Préférences alimentaires',
+  details_allergens: 'Allergènes & intolérances',
+  details_allergens_note: 'Ne cocher qu\'en cas d\'allergie ou d\'intolérance diagnostiquée',
+  dietary_labels: {
+    Vegetarian: 'Végétarien', Vegan: 'Végétalien', Pescatarian: 'Pescétarien',
+    Halal: 'Halal', Kosher: 'Casher',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Crustacés', Eggs: 'Œufs', Fish: 'Poisson',
+    Peanuts: 'Arachides', Soybeans: 'Soja', 'Milk/Lactose': 'Lait/Lactose',
+    'Tree nuts': 'Fruits à coque', Celery: 'Céleri', Mustard: 'Moutarde',
+    Sesame: 'Sésame', Sulphites: 'Sulfites', Lupin: 'Lupin', Molluscs: 'Mollusques',
+  },
   details_sending: 'Envoi…',
   details_send_code: 'Envoyer le code de confirmation',
   otp_title: 'Confirmer la réservation',
@@ -426,7 +502,19 @@ const es: WidgetTranslations = {
   details_email: 'Email',
   details_phone: 'Teléfono',
   details_notes: 'Peticiones especiales',
-  details_allergens: 'Alérgenos',
+  details_dietary: 'Preferencias alimentarias',
+  details_allergens: 'Alérgenos e intolerancias',
+  details_allergens_note: 'Marcar solo si tiene una alergia o intolerancia diagnosticada',
+  dietary_labels: {
+    Vegetarian: 'Vegetariano', Vegan: 'Vegano', Pescatarian: 'Pescetariano',
+    Halal: 'Halal', Kosher: 'Kosher',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Crustáceos', Eggs: 'Huevos', Fish: 'Pescado',
+    Peanuts: 'Cacahuetes', Soybeans: 'Soja', 'Milk/Lactose': 'Leche/Lactosa',
+    'Tree nuts': 'Frutos secos', Celery: 'Apio', Mustard: 'Mostaza',
+    Sesame: 'Sésamo', Sulphites: 'Sulfitos', Lupin: 'Altramuces', Molluscs: 'Moluscos',
+  },
   details_sending: 'Enviando…',
   details_send_code: 'Enviar código de confirmación',
   otp_title: 'Confirmar reserva',
@@ -480,7 +568,19 @@ const sr: WidgetTranslations = {
   details_email: 'E-mail',
   details_phone: 'Telefon',
   details_notes: 'Posebni zahtevi',
-  details_allergens: 'Alergeni',
+  details_dietary: 'Prehrambene preferencije',
+  details_allergens: 'Alergeni i intolerance',
+  details_allergens_note: 'Označite samo ako imate dijagnostikovanu alergiju ili intoleranciju',
+  dietary_labels: {
+    Vegetarian: 'Vegetarijanac', Vegan: 'Vegan', Pescatarian: 'Pesketarijanac',
+    Halal: 'Halal', Kosher: 'Košer',
+  },
+  allergen_labels: {
+    Gluten: 'Gluten', Crustaceans: 'Rakovi', Eggs: 'Jaja', Fish: 'Riba',
+    Peanuts: 'Kikiriki', Soybeans: 'Soja', 'Milk/Lactose': 'Mleko/Laktoza',
+    'Tree nuts': 'Orasi', Celery: 'Celer', Mustard: 'Senf',
+    Sesame: 'Susam', Sulphites: 'Sulfiti', Lupin: 'Lupina', Molluscs: 'Mekušci',
+  },
   details_sending: 'Slanje…',
   details_send_code: 'Pošalji potvrdni kôd',
   otp_title: 'Potvrdi rezervaciju',

@@ -8,6 +8,7 @@ export const supabaseWidget = createBrowserClient(
   {
     auth: {
       storageKey: 'mise-widget-session',
+      flowType: 'implicit',
     },
   },
 )
