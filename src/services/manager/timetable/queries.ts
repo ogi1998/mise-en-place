@@ -40,7 +40,8 @@ export async function getTimetableBookings(
 		.select(
 			`
       id, booking_number, status, party_size,
-      start_time, end_time, notes, internal_notes, is_delayed, allergens,
+      start_time, end_time, notes, internal_notes, is_delayed, spend_amount, allergens,
+      guest_id, service_area_id,
       guests(first_name, last_name, email, phone)
     `
 		)
@@ -65,8 +66,10 @@ export async function getTimetableBookings(
 	}, {});
 
 	return bookings.map((b) => ({
-		...(b as unknown as Omit<TimetableBooking, 'table_ids'>),
-		table_ids: tableMap[b.id] ?? []
+		...(b as unknown as Omit<TimetableBooking, 'table_ids' | 'guest_id' | 'service_area_id'>),
+		table_ids: tableMap[b.id] ?? [],
+		guest_id: (b as unknown as { guest_id: string | null }).guest_id ?? null,
+		service_area_id: (b as unknown as { service_area_id: string | null }).service_area_id ?? null,
 	}));
 }
 

@@ -9,7 +9,9 @@ type BookingBlockProps = {
 	booking: TimetableBooking;
 	left: number;
 	width: number;
+	colWidth: number;
 	onClick: () => void;
+	onContextMenu: (e: React.MouseEvent) => void;
 };
 
 function blockColors(status: string) {
@@ -27,10 +29,10 @@ function blockColors(status: string) {
 	}
 }
 
-export default function BookingBlock({ booking, left, width, onClick }: BookingBlockProps) {
+export default function BookingBlock({ booking, left, width, colWidth, onClick, onContextMenu }: BookingBlockProps) {
 	const [showTooltip, setShowTooltip] = useState(false);
 	const colors = blockColors(booking.status);
-	const tailWidth = bufferTailWidth();
+	const tailWidth = bufferTailWidth(colWidth);
 	const mainWidth = Math.max(0, width - tailWidth);
 
 	const guestName = booking.guests ? `${booking.guests.first_name} ${booking.guests.last_name}` : 'Walk-in';
@@ -40,6 +42,8 @@ export default function BookingBlock({ booking, left, width, onClick }: BookingB
 			className='absolute top-1 flex cursor-pointer select-none'
 			style={{ left, width, height: ROW_HEIGHT - 8 }}
 			onClick={onClick}
+			onContextMenu={onContextMenu}
+			onDoubleClick={(e) => e.stopPropagation()}
 			onMouseEnter={() => setShowTooltip(true)}
 			onMouseLeave={() => setShowTooltip(false)}>
 			{/* Main booking block */}
@@ -105,7 +109,7 @@ export default function BookingBlock({ booking, left, width, onClick }: BookingB
 						{isoToHHMM(booking.start_time)} – {isoToHHMM(booking.end_time)}
 					</p>
 					<p className='text-[11px] text-black/50'>{booking.party_size} guests</p>
-					{booking.is_delayed && <p className='mt-1 text-[11px] font-medium text-red-500'>⚠ Delayed</p>}
+					{booking.is_delayed && <p className='mt-1 text-[11px] font-medium text-red-500'>Delayed</p>}
 					{booking.notes && <p className='mt-1 text-[11px] text-black/40 italic'>{booking.notes}</p>}
 				</div>
 			)}

@@ -24,6 +24,7 @@ export type FloorPlanBooking = {
   notes: string | null
   internal_notes: string | null
   is_delayed: boolean
+  spend_amount: number | null
   table_ids: string[]
   guests: {
     first_name: string

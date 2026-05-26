@@ -12,6 +12,7 @@ export type BookingListItem = {
   notes: string | null
   internal_notes: string | null
   is_delayed: boolean
+  spend_amount: number | null
   allergens: string[] | null
   table_ids: string[]
   service_area: { id: string; name: string } | null
