@@ -37,8 +37,11 @@ export default function BookingsShell({
       notes: b.notes,
       internal_notes: b.internal_notes,
       is_delayed: b.is_delayed,
-      allergens: b.allergens, // add this
+      spend_amount: b.spend_amount,
+      allergens: b.allergens,
       table_ids: b.table_ids,
+      guest_id: null,
+      service_area_id: b.service_area?.id ?? null,
       guests: b.guests,
     };
   }

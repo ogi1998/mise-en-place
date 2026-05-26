@@ -70,6 +70,9 @@ export default function BookingModal({
     booking?.internal_notes ?? "",
   );
   const [isDelayed, setIsDelayed] = useState(booking?.is_delayed ?? false);
+  const [spendAmount, setSpendAmount] = useState(
+    booking?.spend_amount != null ? String(booking.spend_amount) : ''
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "notes">("details");
   const [selectedBookingId, setSelectedBookingId] = useState("");
@@ -102,6 +105,7 @@ export default function BookingModal({
           notes: notes || null,
           internal_notes: internalNotes || null,
           is_delayed: isDelayed,
+          spend_amount: spendAmount !== '' ? parseFloat(spendAmount) : null,
           ...(status === "confirmed"
             ? { confirmed_at: new Date().toISOString() }
             : {}),
@@ -114,7 +118,7 @@ export default function BookingModal({
         .select(
           `
 					id, booking_number, status, party_size,
-					start_time, end_time, notes, internal_notes, is_delayed,
+					start_time, end_time, notes, internal_notes, is_delayed, spend_amount,
 					guests(first_name, last_name, email, phone)
 				`,
         )
@@ -337,6 +341,21 @@ export default function BookingModal({
                     }`}
                   />
                 </button>
+              </div>
+
+              <div>
+                <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wider text-black/35">
+                  Spend
+                </p>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={spendAmount}
+                  onChange={(e) => setSpendAmount(e.target.value)}
+                  className="w-full rounded-xl border border-black/8 bg-black/2 px-3 py-2.5 text-[13px] text-[#1a1a18] placeholder-black/25 outline-none focus:border-black/20 focus:bg-white"
+                />
               </div>
 
               {booking?.guests && (

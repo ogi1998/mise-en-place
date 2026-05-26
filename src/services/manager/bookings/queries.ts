@@ -11,7 +11,7 @@ export async function getBookingsForDate(
     .select(`
       id, booking_number, status, source, party_size,
       booking_date, start_time, end_time, notes, internal_notes,
-      is_delayed, allergens,
+      is_delayed, spend_amount, allergens,
       service_areas(id, name),
       guests(first_name, last_name, email, phone)
     `)

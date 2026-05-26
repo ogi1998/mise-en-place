@@ -120,7 +120,7 @@ export default function CalendarGrid({ year, month, counts, eventDates = [] }: P
       <div className="grid grid-cols-7">
         {cells.map((day, idx) => {
           if (!day) {
-            return <div key={`empty-${idx}`} className="h-24 border-b border-r border-[#e8e4dc] last:border-r-0 bg-[#faf9f6]/50" />
+            return <div key={`empty-${idx}`} className="h-28 border-b border-r border-[#e8e4dc] last:border-r-0 bg-[#faf9f6]/50" />
           }
 
           const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
@@ -134,7 +134,7 @@ export default function CalendarGrid({ year, month, counts, eventDates = [] }: P
             <button
               key={dateStr}
               onClick={() => goToDay(dateStr)}
-              className={`h-24 border-b border-r border-[#e8e4dc] p-2.5 text-left transition-colors hover:brightness-95 cursor-pointer ${
+              className={`h-28 border-b border-r border-[#e8e4dc] p-2 text-left transition-colors hover:brightness-95 cursor-pointer ${
                 isWeekend && level === 0 ? 'bg-[#faf9f6]/60' : ''
               } ${HEAT_BG[level]}`}
             >
@@ -147,7 +147,7 @@ export default function CalendarGrid({ year, month, counts, eventDates = [] }: P
               </span>
 
               {dayData && (
-                <div className="mt-2 space-y-0.5">
+                <div className="mt-1 space-y-0.5">
                   <p className={`text-xs font-semibold ${HEAT_TEXT[level]}`}>
                     {dayData.bookings} {dayData.bookings === 1 ? 'booking' : 'bookings'}
                   </p>

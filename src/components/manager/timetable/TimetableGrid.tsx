@@ -6,9 +6,9 @@ import {
 	generateTimeLabels,
 	gridWidth,
 	nowLineLeft,
-	COL_WIDTH,
 	ROW_HEIGHT,
-	HEADER_HEIGHT
+	HEADER_HEIGHT,
+	ZOOM_LEVELS,
 } from '@/services/manager/timetable/utils';
 import TableRow from '@/components/manager/timetable/TableRow';
 import ClipboardRow from '@/components/manager/timetable/ClipboardRow';
@@ -19,14 +19,38 @@ type TimetableGridProps = {
 	bookings: TimetableBooking[];
 	schedule: DaySchedule;
 	date: string;
+	areaId: string;
+	zoomIndex: number;
+	onZoomChange: (updater: (prev: number) => number) => void;
 	onBookingClick: (booking: TimetableBooking) => void;
+	onBookingContextMenu: (booking: TimetableBooking, x: number, y: number) => void;
+	onNewBooking: (table: TimetableTable, areaId: string, startTime: string) => void;
 };
 
-export default function TimetableGrid({ tables, bookings, schedule, date, onBookingClick }: TimetableGridProps) {
+export default function TimetableGrid({
+	tables,
+	bookings,
+	schedule,
+	date,
+	areaId,
+	zoomIndex,
+	onZoomChange,
+	onBookingClick,
+	onBookingContextMenu,
+	onNewBooking,
+}: TimetableGridProps) {
 	const scrollRef = useRef<HTMLDivElement>(null);
+	const scrollbarRef = useRef<HTMLDivElement>(null);
+	const isSyncing = useRef(false);
+	const onZoomChangeRef = useRef(onZoomChange);
+	onZoomChangeRef.current = onZoomChange;
 	const [nowLeft, setNowLeft] = useState<number | null>(null);
-	const timeLabels = generateTimeLabels(schedule);
-	const totalWidth = gridWidth(schedule);
+
+	const { colWidth, labelInterval } = ZOOM_LEVELS[zoomIndex];
+	const timeLabels = generateTimeLabels(schedule, labelInterval);
+	const labelCellWidth = Math.round(labelInterval / 15 * colWidth);
+	// grid must be as wide as the label row (labels include the closing-time tick = one extra cell)
+	const totalWidth = gridWidth(schedule, colWidth) + labelCellWidth;
 
 	const isToday = date === new Date().toISOString().split('T')[0];
 
@@ -35,17 +59,55 @@ export default function TimetableGrid({ tables, bookings, schedule, date, onBook
 			setNowLeft(null);
 			return;
 		}
-		const update = () => setNowLeft(nowLineLeft(schedule));
+		const update = () => setNowLeft(nowLineLeft(schedule, colWidth));
 		update();
 		const interval = setInterval(update, 60_000);
 		return () => clearInterval(interval);
-	}, [schedule, isToday]);
+	}, [schedule, isToday, colWidth]);
 
 	useEffect(() => {
 		if (nowLeft !== null && scrollRef.current) {
-			scrollRef.current.scrollLeft = Math.max(0, nowLeft - 200);
+			const target = Math.max(0, nowLeft - 200);
+			scrollRef.current.scrollLeft = target;
+			if (scrollbarRef.current) scrollbarRef.current.scrollLeft = target;
 		}
 	}, [nowLeft]);
+
+	function handleContentScroll() {
+		if (isSyncing.current) return;
+		isSyncing.current = true;
+		if (scrollbarRef.current && scrollRef.current) {
+			scrollbarRef.current.scrollLeft = scrollRef.current.scrollLeft;
+		}
+		isSyncing.current = false;
+	}
+
+	function handleBarScroll() {
+		if (isSyncing.current) return;
+		isSyncing.current = true;
+		if (scrollRef.current && scrollbarRef.current) {
+			scrollRef.current.scrollLeft = scrollbarRef.current.scrollLeft;
+		}
+		isSyncing.current = false;
+	}
+
+	useEffect(() => {
+		const el = scrollRef.current;
+		if (!el) return;
+
+		function handleWheel(e: WheelEvent) {
+			if (!e.ctrlKey) return;
+			e.preventDefault();
+			onZoomChangeRef.current((prev) =>
+				e.deltaY < 0
+					? Math.min(prev + 1, ZOOM_LEVELS.length - 1)
+					: Math.max(prev - 1, 0)
+			);
+		}
+
+		el.addEventListener('wheel', handleWheel, { passive: false });
+		return () => el.removeEventListener('wheel', handleWheel);
+	}, []);
 
 	const assignedBookings = bookings.filter((b) => b.table_ids.length > 0);
 	const unassignedBookings = bookings.filter((b) => b.table_ids.length === 0);
@@ -60,7 +122,7 @@ export default function TimetableGrid({ tables, bookings, schedule, date, onBook
 
 	return (
 		<div className='flex h-full flex-col overflow-hidden bg-[#faf9f6]'>
-			<div className='flex flex-1 overflow-hidden'>
+			<div className='flex flex-1 overflow-hidden' style={{ minHeight: 0 }}>
 				<div className='shrink-0 border-r border-black/6 bg-white' style={{ width: 80 }}>
 					<div style={{ height: HEADER_HEIGHT }} className='border-b border-black/6' />
 
@@ -85,18 +147,16 @@ export default function TimetableGrid({ tables, bookings, schedule, date, onBook
 					)}
 				</div>
 
-				<div ref={scrollRef} className='flex-1 overflow-x-auto overflow-y-hidden'>
+				<div ref={scrollRef} onScroll={handleContentScroll} className='flex-1 overflow-x-auto overflow-y-hidden relative [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
 					<div style={{ width: totalWidth, minWidth: totalWidth }} className='relative'>
 						<div
 							style={{ height: HEADER_HEIGHT }}
 							className='sticky top-0 z-10 flex border-b border-black/6 bg-white'>
-							{timeLabels.map((label, i) => (
+							{timeLabels.map((label) => (
 								<div
 									key={label}
-									style={{ width: COL_WIDTH * 2, minWidth: COL_WIDTH * 2 }} // 30min = 2 cols
-									className={`flex items-center border-r border-black/4 px-1.5 last:border-0 ${
-										i === 0 ? '' : ''
-									}`}>
+									style={{ width: labelCellWidth, minWidth: labelCellWidth }}
+									className='flex items-center border-r border-black/4 px-1.5 last:border-0'>
 									<span className='text-[10px] tabular-nums text-black/35'>{label}</span>
 								</div>
 							))}
@@ -112,7 +172,12 @@ export default function TimetableGrid({ tables, bookings, schedule, date, onBook
 										bookings={tableBookings}
 										schedule={schedule}
 										totalWidth={totalWidth}
+										colWidth={colWidth}
+										areaId={areaId}
+										date={date}
 										onBookingClick={onBookingClick}
+										onBookingContextMenu={onBookingContextMenu}
+										onNewBooking={onNewBooking}
 									/>
 								);
 							})}
@@ -125,10 +190,22 @@ export default function TimetableGrid({ tables, bookings, schedule, date, onBook
 								bookings={unassignedBookings}
 								schedule={schedule}
 								totalWidth={totalWidth}
+								colWidth={colWidth}
 								onBookingClick={onBookingClick}
+								onBookingContextMenu={onBookingContextMenu}
 							/>
 						)}
 					</div>
+				</div>
+			</div>
+			{/* Custom scrollbar rail — fixed 12px height so layout never shifts */}
+			<div className='flex shrink-0 border-t border-black/4'>
+				<div style={{ width: 80 }} className='shrink-0' />
+				<div
+					ref={scrollbarRef}
+					onScroll={handleBarScroll}
+					className='flex-1 h-3 overflow-x-auto [scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.2)_transparent] [&::-webkit-scrollbar]:h-3 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-black/20 [&::-webkit-scrollbar-track]:bg-transparent'>
+					<div style={{ width: totalWidth, height: 1 }} />
 				</div>
 			</div>
 		</div>

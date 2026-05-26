@@ -17,10 +17,13 @@ import { getEventsForDate } from "@/services/manager/events/queries";
 import type { Event } from "@/services/manager/events/types";
 
 import { FALLBACK_SCHEDULE } from "@/services/manager/timetable/types";
+import { ZOOM_LEVELS, DEFAULT_ZOOM_INDEX } from "@/services/manager/timetable/utils";
 import TimetableHeader from "@/components/manager/timetable/TimetableHeader";
 import AreaTabs from "@/components/manager/ui/AreaTabs";
 import TimetableGrid from "@/components/manager/timetable/TimetableGrid";
 import BookingModal from "@/components/manager/ui/BookingModal";
+import BookingContextMenu from "@/components/manager/timetable/BookingContextMenu";
+import NewBookingModal from "@/components/manager/timetable/NewBookingModal";
 
 export type AreaData = {
   area: TimetableArea;
@@ -46,8 +49,9 @@ export default function TimetableShell({
   initialEvents,
 }: TimetableShellProps) {
   const [date, setDate] = useState(initialDate);
+  const [zoomIndex, setZoomIndex] = useState(DEFAULT_ZOOM_INDEX);
   const [activeAreaIds, setActiveAreaIds] = useState<string[]>(
-    initialAreas.map((a) => a.id), // all selected by default
+    initialAreas.map((a) => a.id),
   );
   const [areaData, setAreaData] = useState<AreaData[]>(initialAreaData);
   const [bookings, setBookings] = useState(initialBookings);
@@ -55,6 +59,16 @@ export default function TimetableShell({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] =
     useState<TimetableBooking | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    booking: TimetableBooking;
+    x: number;
+    y: number;
+  } | null>(null);
+  const [newBooking, setNewBooking] = useState<{
+    table: TimetableTable;
+    areaId: string;
+    startTime: string;
+  } | null>(null);
 
   const fetchData = useCallback(
     async (newDate: string, areaIds: string[]) => {
@@ -114,7 +128,75 @@ export default function TimetableShell({
     setSelectedBooking(updated);
   }, []);
 
-  // Filter areaData to only selected areas, in selection order
+  const handleContextMenuAction = useCallback(
+    async (action: 'edit' | 'duplicate' | 'cancel' | 'no_show' | 'unassign', booking: TimetableBooking) => {
+      setContextMenu(null);
+
+      if (action === 'edit') {
+        setSelectedBooking(booking);
+        return;
+      }
+
+      if (action === 'cancel') {
+        const { error } = await supabase
+          .from('bookings')
+          .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+          .eq('id', booking.id);
+        if (!error) {
+          setBookings((prev) => prev.map((b) =>
+            b.id === booking.id ? { ...b, status: 'cancelled' as const } : b
+          ));
+        }
+        return;
+      }
+
+      if (action === 'no_show') {
+        const { error } = await supabase
+          .from('bookings')
+          .update({ status: 'no_show' })
+          .eq('id', booking.id);
+        if (!error) {
+          setBookings((prev) => prev.map((b) =>
+            b.id === booking.id ? { ...b, status: 'no_show' as const } : b
+          ));
+        }
+        return;
+      }
+
+      if (action === 'unassign') {
+        const { error } = await supabase
+          .from('booking_tables')
+          .delete()
+          .eq('booking_id', booking.id);
+        if (!error) {
+          setBookings((prev) => prev.map((b) =>
+            b.id === booking.id ? { ...b, table_ids: [] } : b
+          ));
+        }
+        return;
+      }
+
+      if (action === 'duplicate') {
+        await fetch('/api/manager/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date,
+            start_time: booking.start_time,
+            end_time: booking.end_time,
+            party_size: booking.party_size,
+            table_id: booking.table_ids[0] ?? null,
+            area_id: booking.service_area_id,
+            guest_id: booking.guest_id,
+            notes: booking.notes,
+          }),
+        });
+        fetchData(date, activeAreaIds);
+      }
+    },
+    [date, activeAreaIds, fetchData],
+  );
+
   const visibleAreaData = areaData.filter((ad) =>
     activeAreaIds.includes(ad.area.id),
   );
@@ -145,12 +227,18 @@ export default function TimetableShell({
             <p className="text-[13px] text-black/40">Loading...</p>
           </div>
         )}
-        {visibleAreaData.map(({ area, tables, schedule }) => (
+        {visibleAreaData.map(({ area, tables, schedule }) => {
+          const { labelInterval } = ZOOM_LEVELS[zoomIndex];
+          const zoomLabel = labelInterval < 60 ? `${labelInterval} min` : `${labelInterval / 60} hr`;
+          return (
           <div key={area.id}>
             {visibleAreaData.length > 1 && (
-              <div className="px-4 py-2 bg-[#f0ede6] border-b border-black/6">
+              <div className="flex items-center px-4 py-2 bg-[#f0ede6] border-b border-black/6">
                 <span className="text-[11px] font-semibold uppercase tracking-widest text-black/40">
                   {area.name}
+                </span>
+                <span className="ml-auto text-[10px] tabular-nums text-black/30">
+                  {zoomLabel}
                 </span>
               </div>
             )}
@@ -159,17 +247,50 @@ export default function TimetableShell({
               bookings={bookings}
               schedule={schedule}
               date={date}
+              areaId={area.id}
+              zoomIndex={zoomIndex}
+              onZoomChange={(updater) => setZoomIndex(updater)}
               onBookingClick={setSelectedBooking}
+              onBookingContextMenu={(booking, x, y) =>
+                setContextMenu({ booking, x, y })
+              }
+              onNewBooking={(table, areaId, startTime) =>
+                setNewBooking({ table, areaId, startTime })
+              }
             />
           </div>
-        ))}
+        );
+        })}
       </div>
+
       {selectedBooking && (
         <BookingModal
           booking={selectedBooking}
           onClose={() => setSelectedBooking(null)}
           onUpdate={handleBookingUpdate}
           restaurantId={restaurantId}
+        />
+      )}
+
+      {contextMenu && (
+        <BookingContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          booking={contextMenu.booking}
+          onAction={(action) => handleContextMenuAction(action, contextMenu.booking)}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
+
+      {newBooking && (
+        <NewBookingModal
+          restaurantId={restaurantId}
+          table={newBooking.table}
+          areaId={newBooking.areaId}
+          date={date}
+          startTime={newBooking.startTime}
+          onClose={() => setNewBooking(null)}
+          onCreated={() => fetchData(date, activeAreaIds)}
         />
       )}
     </div>

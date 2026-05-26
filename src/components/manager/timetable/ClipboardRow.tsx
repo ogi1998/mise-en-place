@@ -6,10 +6,19 @@ type ClipboardRowProps = {
 	bookings: TimetableBooking[];
 	schedule: DaySchedule;
 	totalWidth: number;
+	colWidth: number;
 	onBookingClick: (booking: TimetableBooking) => void;
+	onBookingContextMenu: (booking: TimetableBooking, x: number, y: number) => void;
 };
 
-export default function ClipboardRow({ bookings, schedule, totalWidth, onBookingClick }: ClipboardRowProps) {
+export default function ClipboardRow({
+	bookings,
+	schedule,
+	totalWidth,
+	colWidth,
+	onBookingClick,
+	onBookingContextMenu,
+}: ClipboardRowProps) {
 	return (
 		<div
 			style={{ width: totalWidth, height: ROW_HEIGHT }}
@@ -17,14 +26,19 @@ export default function ClipboardRow({ bookings, schedule, totalWidth, onBooking
 			<div className='absolute inset-0 bg-black/1' />
 
 			{bookings.map((booking) => {
-				const { left, width } = bookingToStyle(booking.start_time, booking.end_time, schedule);
+				const { left, width } = bookingToStyle(booking.start_time, booking.end_time, schedule, colWidth);
 				return (
 					<BookingBlock
 						key={booking.id}
 						booking={booking}
 						left={left}
 						width={width}
+						colWidth={colWidth}
 						onClick={() => onBookingClick(booking)}
+						onContextMenu={(e) => {
+							e.preventDefault()
+							onBookingContextMenu(booking, e.clientX, e.clientY)
+						}}
 					/>
 				);
 			})}
