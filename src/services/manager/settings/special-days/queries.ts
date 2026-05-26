@@ -9,7 +9,6 @@ export async function getSpecialDays(
     .from('special_days')
     .select('*')
     .eq('restaurant_id', restaurantId)
-    .is('service_area_id', null)
     .order('date')
 
   if (error) return { data: [], error: error.message }

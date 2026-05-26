@@ -17,7 +17,11 @@ import {
 import { todayISO } from '@/services/manager/settings/special-days/utils'
 import type { SpecialDay } from '@/services/manager/settings/special-days/types'
 
-export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) {
+export function useSpecialDays(
+  initialDays: SpecialDay[],
+  restaurantId: string,
+  serviceAreas: { id: string; name: string }[],
+) {
   const [days, setDays] = useState<SpecialDay[]>(initialDays)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -33,9 +37,15 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
   })
 
   function cleanPayload(data: SpecialDayFormData) {
+    const base = {
+      ...data,
+      date_end: data.date_end || null,
+      weather_status: data.weather_status || null,
+      service_area_id: data.service_area_id || null,
+    }
     if (data.type === 'closed' || data.type === 'open') {
       return {
-        ...data,
+        ...base,
         open_time: null,
         close_time: null,
         pause_from: null,
@@ -43,7 +53,7 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
         slot_interval: null,
       }
     }
-    return data
+    return base
   }
 
   function handleOpenCreate() {
@@ -64,7 +74,6 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
     const { data: created, error } = await createSpecialDay(supabase, {
       ...cleanPayload(data),
       restaurant_id: restaurantId,
-      service_area_id: null,
     })
     if (error) {
       setFormError(error)
@@ -82,6 +91,8 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
     form.reset({
       name: day.name,
       date: day.date,
+      date_end: day.date_end ?? null,
+      service_area_id: day.service_area_id ?? null,
       type: day.type,
       open_time: day.open_time,
       close_time: day.close_time,
@@ -89,6 +100,7 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
       pause_to: day.pause_to,
       slot_interval: day.slot_interval ?? 30,
       is_recurring: day.is_recurring,
+      weather_status: day.weather_status ?? null,
     })
   }
 
@@ -101,13 +113,14 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
     if (!editingId) return
     setSaving(true)
     setFormError('')
-    const { error } = await updateSpecialDay(supabase, editingId, cleanPayload(data))
+    const payload = cleanPayload(data)
+    const { error } = await updateSpecialDay(supabase, editingId, payload)
     if (error) {
       setFormError(error)
     } else {
       setDays(prev =>
         prev
-          .map(d => d.id === editingId ? { ...d, ...cleanPayload(data) } : d)
+          .map(d => d.id === editingId ? { ...d, ...payload } : d)
           .sort((a, b) => a.date.localeCompare(b.date))
       )
       setEditingId(null)
@@ -137,6 +150,7 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
     const { data: created, error } = await createSpecialDay(supabase, {
       name: 'Closed today',
       date: today,
+      date_end: null,
       type: 'closed',
       restaurant_id: restaurantId,
       service_area_id: null,
@@ -146,6 +160,7 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
       pause_to: null,
       slot_interval: null,
       is_recurring: false,
+      weather_status: null,
     })
     if (error) {
       setKillSwitchError(error)
@@ -153,6 +168,28 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
       setDays(prev => [...prev, created].sort((a, b) => a.date.localeCompare(b.date)))
     }
     setKillSwitchLoading(false)
+  }
+
+  async function handleAddHoliday(name: string, date: string) {
+    const { data: created, error } = await createSpecialDay(supabase, {
+      name,
+      date,
+      date_end: null,
+      type: 'closed',
+      restaurant_id: restaurantId,
+      service_area_id: null,
+      open_time: null,
+      close_time: null,
+      pause_from: null,
+      pause_to: null,
+      slot_interval: null,
+      is_recurring: true,
+      weather_status: null,
+    })
+    if (!error && created) {
+      setDays(prev => [...prev, created].sort((a, b) => a.date.localeCompare(b.date)))
+    }
+    return { error }
   }
 
   return {
@@ -165,6 +202,7 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
     killSwitchLoading,
     killSwitchError,
     form,
+    serviceAreas,
     handleOpenCreate,
     handleCancelCreate,
     handleCreate,
@@ -173,5 +211,6 @@ export function useSpecialDays(initialDays: SpecialDay[], restaurantId: string) 
     handleUpdate,
     handleDelete,
     handleKillSwitch,
+    handleAddHoliday,
   }
 }
