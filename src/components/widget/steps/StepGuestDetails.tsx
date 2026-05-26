@@ -19,22 +19,30 @@ const guestSchema = z.object({
 
 type GuestFormData = z.infer<typeof guestSchema>
 
-const ALLERGEN_OPTIONS = [
-  'Gluten', 'Dairy', 'Eggs', 'Nuts', 'Peanuts',
-  'Shellfish', 'Fish', 'Soy', 'Sesame',
+const DIETARY_OPTIONS = [
+  'Vegetarian', 'Vegan', 'Pescatarian', 'Halal', 'Kosher',
+]
+
+const EU_ALLERGENS = [
+  'Gluten', 'Crustaceans', 'Eggs', 'Fish', 'Peanuts',
+  'Soybeans', 'Milk/Lactose', 'Tree nuts', 'Celery',
+  'Mustard', 'Sesame', 'Sulphites', 'Lupin', 'Molluscs',
 ]
 
 type Props = {
   booking: BookingState
+  restaurantId: string
   onChange: (updates: Partial<BookingState>) => void
   onNext: () => void
   onBack: () => void
   t: WidgetTranslations
 }
 
-export default function StepGuestDetails({ booking, onChange, onNext, onBack, t }: Props) {
+export default function StepGuestDetails({ booking, restaurantId, onChange, onNext, onBack, t }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+
+  const isGoogle = booking.authMethod === 'google'
 
   const { register, handleSubmit, formState: { errors } } = useForm<GuestFormData>({
     resolver: zodResolver(guestSchema),
@@ -66,6 +74,43 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack, t 
       notes:     data.notes ?? '',
     })
 
+    if (isGoogle && booking.googleAccessToken) {
+      try {
+        const res = await fetch('/api/widget/book', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${booking.googleAccessToken}`,
+          },
+          body: JSON.stringify({
+            restaurant_id:   restaurantId,
+            service_area_id: booking.serviceAreaId,
+            party_size:      booking.partySize,
+            booking_date:    booking.date,
+            slot_time:       booking.slot,
+            first_name:      data.firstName,
+            last_name:       data.lastName,
+            email:           data.email,
+            phone:           data.phone,
+            notes:           data.notes || null,
+            allergens:       booking.allergens,
+          }),
+        })
+        const json = await res.json()
+        if (!res.ok) {
+          setSubmitError(json.error ?? 'Something went wrong. Please try again.')
+        } else {
+          onChange({ bookingId: json.bookingId })
+          onNext()
+        }
+      } catch {
+        setSubmitError('Network error. Please try again.')
+      }
+      setSubmitting(false)
+      return
+    }
+
+    // OTP path
     const { error: err } = await supabaseWidget.auth.signInWithOtp({ email: data.email })
     setSubmitting(false)
     if (err) {
@@ -108,15 +153,19 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack, t 
           />
           {errors.lastName && <p className="mt-1 text-xs text-red-500">{errors.lastName.message}</p>}
         </div>
-        <div className="col-span-2">
-          <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_email}</label>
-          <input
-            {...register('email')}
-            type="email"
-            className="w-full px-3 py-2.5 text-sm border border-[#e8e4dc] rounded-xl bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
-          />
-          {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
-        </div>
+        {isGoogle ? (
+          <input type="hidden" {...register('email')} />
+        ) : (
+          <div className="col-span-2">
+            <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_email}</label>
+            <input
+              {...register('email')}
+              type="email"
+              className="w-full px-3 py-2.5 text-sm border border-[#e8e4dc] rounded-xl bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
+            />
+            {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
+          </div>
+        )}
         <div className="col-span-2">
           <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_phone}</label>
           <input
@@ -139,12 +188,42 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack, t 
         </div>
       </div>
 
+      {/* Dietary preferences */}
       <div>
         <label className="block text-xs font-medium text-[#7a7060] mb-2">
-          {t.details_allergens} <span className="text-[#a09880] font-normal">({t.optional})</span>
+          {t.details_dietary} <span className="text-[#a09880] font-normal">({t.optional})</span>
         </label>
         <div className="flex flex-wrap gap-2">
-          {ALLERGEN_OPTIONS.map(allergen => {
+          {DIETARY_OPTIONS.map(opt => {
+            const selected = booking.allergens.includes(opt)
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => toggleAllergen(opt)}
+                className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                  selected
+                    ? 'bg-[#1a1a18] text-[#f5f0e8] border-[#1a1a18]'
+                    : 'bg-white text-[#5a5545] border-[#e8e4dc] hover:border-[#1a1a18]'
+                }`}
+              >
+                {t.dietary_labels[opt] ?? opt}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* EU 14 allergens */}
+      <div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <label className="block text-xs font-medium text-[#7a7060]">
+            {t.details_allergens} <span className="text-[#a09880] font-normal">({t.optional})</span>
+          </label>
+        </div>
+        <p className="text-xs text-[#a09880] mb-2">ⓘ {t.details_allergens_note}</p>
+        <div className="flex flex-wrap gap-2">
+          {EU_ALLERGENS.map(allergen => {
             const selected = booking.allergens.includes(allergen)
             return (
               <button
@@ -157,7 +236,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack, t 
                     : 'bg-white text-[#5a5545] border-[#e8e4dc] hover:border-[#1a1a18]'
                 }`}
               >
-                {allergen}
+                {t.allergen_labels[allergen] ?? allergen}
               </button>
             )
           })}
@@ -171,7 +250,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack, t 
         disabled={submitting}
         className="w-full py-3 bg-[#1a1a18] text-[#f5f0e8] rounded-xl text-sm font-medium hover:bg-[#2a2a26] disabled:opacity-50 transition-colors"
       >
-        {submitting ? t.details_sending : t.details_send_code}
+        {submitting ? t.details_sending : isGoogle ? t.otp_confirm : t.details_send_code}
       </button>
     </div>
   )

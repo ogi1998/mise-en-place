@@ -27,6 +27,8 @@ export type BookingState = {
   notes: string
   allergens: string[]
   bookingId: string | null
+  authMethod: 'google' | 'otp' | null
+  googleAccessToken: string | null
 }
 
 const INITIAL_STATE: BookingState = {
@@ -42,6 +44,8 @@ const INITIAL_STATE: BookingState = {
   notes: '',
   allergens: [],
   bookingId: null,
+  authMethod: null,
+  googleAccessToken: null,
 }
 
 const STEPS: Step[] = ['party-size', 'datetime', 'lookup', 'guest-details', 'otp', 'confirmation']
@@ -87,7 +91,9 @@ export default function BookingWidget({
 
   function nextStep() {
     const idx = STEPS.indexOf(step)
-    if (idx < STEPS.length - 1) setStep(STEPS[idx + 1])
+    let nextIdx = idx + 1
+    if (STEPS[nextIdx] === 'otp' && booking.authMethod === 'google') nextIdx++
+    if (nextIdx < STEPS.length) setStep(STEPS[nextIdx])
   }
 
   function prevStep() {
@@ -203,6 +209,7 @@ export default function BookingWidget({
           {step === 'guest-details' && (
             <StepGuestDetails
               booking={booking}
+              restaurantId={restaurantId}
               onChange={updateBooking}
               onNext={nextStep}
               onBack={prevStep}

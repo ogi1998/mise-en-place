@@ -43,11 +43,14 @@ export default function StepLookup({ booking, onChange, onNext, onBack, t }: Pro
         const json = await res.json()
         if (json.guest) {
           onChange({
-            firstName: json.guest.first_name ?? '',
-            lastName:  json.guest.last_name  ?? '',
-            email:     json.guest.email      ?? '',
-            phone:     json.guest.phone      ?? '',
-            allergens: json.guest.allergens  ?? [],
+            firstName:          json.guest.first_name ?? '',
+            lastName:           json.guest.last_name  ?? '',
+            email:              json.guest.email      ?? '',
+            phone:              json.guest.phone      ?? '',
+            allergens:          json.guest.allergens  ?? [],
+            authMethod:         'google',
+            googleAccessToken:  session.access_token,
+            guestUserId:        session.user.id,
           })
           setGoogleLoading(false)
           onNext()
@@ -60,9 +63,12 @@ export default function StepLookup({ booking, onChange, onNext, onBack, t }: Pro
       const fullName = (meta.full_name ?? meta.name ?? '').trim()
       const spaceIdx = fullName.indexOf(' ')
       onChange({
-        firstName: spaceIdx >= 0 ? fullName.slice(0, spaceIdx) : fullName,
-        lastName:  spaceIdx >= 0 ? fullName.slice(spaceIdx + 1) : '',
-        email:     session.user.email ?? meta.email ?? '',
+        firstName:         spaceIdx >= 0 ? fullName.slice(0, spaceIdx) : fullName,
+        lastName:          spaceIdx >= 0 ? fullName.slice(spaceIdx + 1) : '',
+        email:             session.user.email ?? meta.email ?? '',
+        authMethod:        'google',
+        googleAccessToken: session.access_token,
+        guestUserId:       session.user.id,
       })
       setGoogleLoading(false)
       onNext()
