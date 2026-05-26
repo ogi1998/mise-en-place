@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
   const isPublic =
     pathname.startsWith('/login') ||
     pathname.startsWith('/widget') ||
+    pathname.startsWith('/vouchers') ||
     pathname.startsWith('/api/widget') ||
     pathname.startsWith('/auth/callback')
 

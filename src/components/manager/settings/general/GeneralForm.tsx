@@ -67,8 +67,9 @@ function SelectField({ label, error, children }: {
 }
 
 export default function GeneralForm({ form, saving, saveError, saveSuccess, onSave }: Props) {
-  const { handleSubmit, watch, setValue, formState: { errors } } = form
+  const { handleSubmit, watch, setValue, register, formState: { errors } } = form
 
+  const vouchersEnabled = watch('vouchers_enabled')
   const timeFormat = watch('time_format')
   const weekStart = watch('week_start')
   const timezone = watch('timezone')
@@ -203,6 +204,60 @@ export default function GeneralForm({ form, saving, saveError, saveSuccess, onSa
                 })}
               </select>
             </SelectField>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <SectionTitle>Gift Vouchers</SectionTitle>
+        <div className="flex items-center gap-4 mt-3 mb-5">
+          <Toggle
+            checked={vouchersEnabled}
+            onChange={(v) => setValue('vouchers_enabled', v)}
+          />
+          <div>
+            <p className="text-sm text-[#3a3528]">Enable online voucher ordering</p>
+            <p className="text-xs text-[#a09880]">Customers can order gift vouchers at your public voucher page</p>
+          </div>
+        </div>
+        <SectionTitle>Payment &amp; Bank Details</SectionTitle>
+        <p className="text-[11px] text-[#a09880] mt-2 mb-3">
+          Used to generate payment slips for gift voucher orders (UPN / bank transfer).
+        </p>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-[#7a7060] mb-1">Account holder name</label>
+              <input
+                {...register('bank_account_holder')}
+                placeholder="e.g. Restaurant Name d.o.o."
+                className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] placeholder:text-[#b8b4ac] focus:outline-none focus:border-[#1a1a18]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#7a7060] mb-1">Bank name</label>
+              <input
+                {...register('bank_name')}
+                placeholder="e.g. NLB d.d."
+                className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] placeholder:text-[#b8b4ac] focus:outline-none focus:border-[#1a1a18]"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-[#7a7060] mb-1">IBAN</label>
+            <input
+              {...register('bank_iban')}
+              placeholder="e.g. SI56 0510 0801 1234 567"
+              className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] placeholder:text-[#b8b4ac] focus:outline-none focus:border-[#1a1a18] font-mono"
+            />
+          </div>
+          <div className="w-48">
+            <label className="block text-xs font-medium text-[#7a7060] mb-1">BIC / SWIFT</label>
+            <input
+              {...register('bank_bic')}
+              placeholder="e.g. LJBASI2X"
+              className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] placeholder:text-[#b8b4ac] focus:outline-none focus:border-[#1a1a18] font-mono"
+            />
           </div>
         </div>
       </div>
