@@ -10,15 +10,17 @@ import Toggle from '@/components/manager/ui/Toggle'
 
 type Props = {
   form: UseFormReturn<SpecialDayFormData>
+  serviceAreas: { id: string; name: string }[]
   saving: boolean
   error: string
   onSave: (data: SpecialDayFormData) => void
   onCancel: () => void
 }
 
-export default function SpecialDayForm({ form, saving, error, onSave, onCancel }: Props) {
+export default function SpecialDayForm({ form, serviceAreas, saving, error, onSave, onCancel }: Props) {
   const { register, handleSubmit, watch, setValue, control, formState: { errors } } = form
   const type = watch('type')
+  const dateValue = watch('date')
 
   return (
     <div className="border border-[#1a1a18] rounded-lg p-4 bg-white space-y-4">
@@ -34,7 +36,7 @@ export default function SpecialDayForm({ form, saving, error, onSave, onCancel }
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-[#7a7060] mb-1">Date</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">Start date</label>
           <Controller
             control={control}
             name="date"
@@ -51,6 +53,27 @@ export default function SpecialDayForm({ form, saving, error, onSave, onCancel }
         </div>
 
         <div>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">
+            End date <span className="text-[#a09880] font-normal">(optional)</span>
+          </label>
+          <Controller
+            control={control}
+            name="date_end"
+            render={({ field }) => (
+              <DatePicker
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v || null)}
+                min={dateValue || undefined}
+                placeholder="Single day"
+                hasError={!!errors.date_end}
+                theme="manager"
+              />
+            )}
+          />
+          {errors.date_end && <p className="mt-1 text-xs text-red-500">{errors.date_end.message}</p>}
+        </div>
+
+        <div>
           <label className="block text-xs font-medium text-[#7a7060] mb-1">Type</label>
           <select
             {...register('type')}
@@ -60,6 +83,31 @@ export default function SpecialDayForm({ form, saving, error, onSave, onCancel }
             <option value="open">Open</option>
             <option value="modified">Modified Hours</option>
           </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">Service area</label>
+          <select
+            value={watch('service_area_id') ?? ''}
+            onChange={(e) => setValue('service_area_id', e.target.value || null)}
+            className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
+          >
+            <option value="">All areas</option>
+            {serviceAreas.map(area => (
+              <option key={area.id} value={area.id}>{area.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="col-span-2">
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">
+            Weather status <span className="text-[#a09880] font-normal">(optional)</span>
+          </label>
+          <input
+            {...register('weather_status')}
+            placeholder="e.g. Heavy snow"
+            className="w-full px-3 py-2 text-sm border border-[#d8d3ca] rounded-md bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
+          />
         </div>
       </div>
 

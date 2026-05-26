@@ -6,6 +6,7 @@ export type SpecialDay = {
   service_area_id: string | null
   name: string
   date: string
+  date_end: string | null
   type: SpecialDayType
   open_time: string | null
   close_time: string | null
@@ -13,4 +14,5 @@ export type SpecialDay = {
   pause_to: string | null
   slot_interval: number | null
   is_recurring: boolean
+  weather_status: string | null
 }
