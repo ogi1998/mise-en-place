@@ -23,6 +23,11 @@ export function useGeneral(initialSettings: GeneralSettings, restaurantId: strin
       default_language: initialSettings.default_language ?? 'en',
       timezone: initialSettings.timezone ?? 'Europe/Ljubljana',
       currency: initialSettings.currency ?? 'EUR',
+      bank_iban: initialSettings.bank_iban ?? '',
+      bank_name: initialSettings.bank_name ?? '',
+      bank_bic: initialSettings.bank_bic ?? '',
+      bank_account_holder: initialSettings.bank_account_holder ?? '',
+      vouchers_enabled: initialSettings.vouchers_enabled ?? false,
     },
   })
 
@@ -31,7 +36,13 @@ export function useGeneral(initialSettings: GeneralSettings, restaurantId: strin
     setSaveError('')
     setSaveSuccess(false)
 
-    const { error } = await updateGeneralSettings(supabase, restaurantId, data)
+    const { error } = await updateGeneralSettings(supabase, restaurantId, {
+      ...data,
+      bank_iban: data.bank_iban || null,
+      bank_name: data.bank_name || null,
+      bank_bic: data.bank_bic || null,
+      bank_account_holder: data.bank_account_holder || null,
+    })
 
     if (error) {
       setSaveError(error)

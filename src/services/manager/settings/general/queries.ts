@@ -7,7 +7,7 @@ export async function getGeneralSettings(
 ): Promise<{ data: GeneralSettings | null; error: string | null }> {
   const { data, error } = await supabase
     .from('restaurants')
-    .select('time_format, week_start, hide_closed_days, available_languages, default_language, timezone, currency')
+    .select('time_format, week_start, hide_closed_days, available_languages, default_language, timezone, currency, bank_iban, bank_name, bank_bic, bank_account_holder, vouchers_enabled')
     .eq('id', restaurantId)
     .single()
 
@@ -18,7 +18,7 @@ export async function getGeneralSettings(
 export async function updateGeneralSettings(
   supabase: SupabaseClient,
   restaurantId: string,
-  payload: Omit<GeneralSettings, never>
+  payload: Partial<GeneralSettings>
 ): Promise<{ error: string | null }> {
   const { error } = await supabase
     .from('restaurants')

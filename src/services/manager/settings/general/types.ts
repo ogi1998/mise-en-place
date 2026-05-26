@@ -6,4 +6,9 @@ export type GeneralSettings = {
   default_language: string | null
   timezone: string | null
   currency: string | null
+  bank_iban: string | null
+  bank_name: string | null
+  bank_bic: string | null
+  bank_account_holder: string | null
+  vouchers_enabled: boolean | null
 }

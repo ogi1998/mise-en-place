@@ -8,6 +8,11 @@ export const generalSchema = z.object({
   default_language: z.string().min(1, 'Select a default language'),
   timezone: z.string().min(1, 'Select a timezone'),
   currency: z.string().min(1, 'Select a currency'),
+  bank_iban: z.string(),
+  bank_name: z.string(),
+  bank_bic: z.string(),
+  bank_account_holder: z.string(),
+  vouchers_enabled: z.boolean(),
 }).superRefine((data, ctx) => {
   if (!data.available_languages.includes(data.default_language)) {
     ctx.addIssue({
