@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import DatePicker from '@/components/ui/DatePicker'
 import type { BookingState } from '../BookingWidget'
+import type { WidgetTranslations } from '@/lib/widget-translations'
 
 type Props = {
   booking: BookingState
@@ -11,9 +12,10 @@ type Props = {
   onChange: (updates: Partial<BookingState>) => void
   onNext: () => void
   onBack: () => void
+  t: WidgetTranslations
 }
 
-export default function StepDateTime({ booking, restaurantId, onChange, onNext, onBack }: Props) {
+export default function StepDateTime({ booking, restaurantId, onChange, onNext, onBack, t }: Props) {
   const [slots, setSlots] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [closed, setClosed] = useState(false)
@@ -57,34 +59,34 @@ export default function StepDateTime({ booking, restaurantId, onChange, onNext, 
         </button>
         <div>
           <h2 className="text-lg font-semibold text-[#1a1a18]" style={{ fontFamily: 'Playfair Display, serif' }}>
-            Pick a date & time
+            {t.date_title}
           </h2>
-          <p className="text-sm text-[#7a7060]">For {booking.partySize} {booking.partySize === 1 ? 'guest' : 'guests'}</p>
+          <p className="text-sm text-[#7a7060]">{t.date_for} {booking.partySize} {t.guests(booking.partySize)}</p>
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-[#7a7060] mb-1.5">Date</label>
+        <label className="block text-xs font-medium text-[#7a7060] mb-1.5">{t.date_label}</label>
         <DatePicker
           value={booking.date}
           onChange={(date) => onChange({ date })}
           min={today}
-          placeholder="Select a date"
+          placeholder={t.date_select_placeholder}
           theme="widget"
         />
       </div>
 
       {booking.date && (
         <div>
-          <label className="block text-xs font-medium text-[#7a7060] mb-1.5">Available times</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1.5">{t.date_available_times}</label>
           {loading && (
-            <p className="text-sm text-[#a09880] py-2">Loading slots…</p>
+            <p className="text-sm text-[#a09880] py-2">{t.date_loading}</p>
           )}
           {!loading && closed && (
-            <p className="text-sm text-[#a09880] py-2">The restaurant is closed on this date.</p>
+            <p className="text-sm text-[#a09880] py-2">{t.date_closed}</p>
           )}
           {!loading && !closed && slots.length === 0 && (
-            <p className="text-sm text-[#a09880] py-2">No available slots for this date.</p>
+            <p className="text-sm text-[#a09880] py-2">{t.date_no_slots}</p>
           )}
           {!loading && slots.length > 0 && (
             <div className="grid grid-cols-4 gap-2">
@@ -112,7 +114,7 @@ export default function StepDateTime({ booking, restaurantId, onChange, onNext, 
         disabled={!booking.date || !booking.slot}
         className="w-full py-3 bg-[#1a1a18] text-[#f5f0e8] rounded-xl text-sm font-medium hover:bg-[#2a2a26] disabled:opacity-40 transition-colors"
       >
-        Continue
+        {t.continue}
       </button>
     </div>
   )

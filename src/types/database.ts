@@ -14,6 +14,12 @@ export interface Restaurant {
   logo_url: string | null
   cover_url: string | null
   is_active: boolean
+  time_format: '24h' | '12h' | null
+  week_start: 'monday' | 'sunday' | null
+  hide_closed_days: boolean | null
+  available_languages: string[] | null
+  default_language: string | null
+  currency: string | null
   created_at: string
   updated_at: string
 }

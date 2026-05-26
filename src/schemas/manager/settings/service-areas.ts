@@ -5,6 +5,7 @@ export const serviceAreaSchema = z.object({
 	description: z.string(),
 	is_indoor: z.boolean(),
 	is_active: z.boolean(),
+	is_bookable_online: z.boolean(),
 	sort_order: z.number().min(1, 'Sort order must be at least 1')
 });
 

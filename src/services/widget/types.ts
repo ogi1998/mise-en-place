@@ -9,6 +9,8 @@ export type WidgetRestaurant = {
   id: string
   name: string
   slug: string
+  available_languages: string[] | null
+  default_language: string | null
 }
 
 export type WidgetServiceArea = {

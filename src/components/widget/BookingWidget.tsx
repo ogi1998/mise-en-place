@@ -8,6 +8,8 @@ import StepLookup from '@/components/widget/steps/StepLookup'
 import StepGuestDetails from '@/components/widget/steps/StepGuestDetails'
 import StepConfirmation from '@/components/widget/steps/StepConfirmation'
 import EventsSection from '@/components/widget/EventsSection'
+import LanguagePicker from '@/components/widget/LanguagePicker'
+import { getTranslations } from '@/lib/widget-translations'
 import type { WidgetServiceArea, WidgetEvent } from '@/services/widget/types'
 
 type Step = 'party-size' | 'datetime' | 'lookup' | 'guest-details' | 'otp' | 'confirmation'
@@ -44,28 +46,40 @@ const INITIAL_STATE: BookingState = {
 
 const STEPS: Step[] = ['party-size', 'datetime', 'lookup', 'guest-details', 'otp', 'confirmation']
 
-const STEP_LABELS: Record<Step, string> = {
-  'party-size': 'Party',
-  'datetime': 'Date & Time',
-  'lookup': 'You',
-  'guest-details': 'Details',
-  'otp': 'Confirm',
-  'confirmation': 'Done',
-}
-
 type Props = {
   restaurantId: string
   restaurantName: string
   serviceAreas: WidgetServiceArea[]
   events: WidgetEvent[]
+  availableLanguages: string[]
+  defaultLanguage: string
 }
 
-export default function BookingWidget({ restaurantId, restaurantName, serviceAreas, events }: Props) {
+export default function BookingWidget({
+  restaurantId,
+  restaurantName,
+  serviceAreas,
+  events,
+  availableLanguages,
+  defaultLanguage,
+}: Props) {
   const [step, setStep] = useState<Step>('party-size')
   const [booking, setBooking] = useState<BookingState>({
     ...INITIAL_STATE,
     serviceAreaId: serviceAreas[0]?.id ?? '',
   })
+  const [lang, setLang] = useState(defaultLanguage ?? 'en')
+
+  const t = getTranslations(lang)
+
+  const stepLabels: Record<Step, string> = {
+    'party-size': t.step_party,
+    'datetime': t.step_datetime,
+    'lookup': t.step_you,
+    'guest-details': t.step_details,
+    'otp': t.step_confirm_label,
+    'confirmation': t.step_done,
+  }
 
   function updateBooking(updates: Partial<BookingState>) {
     setBooking((prev) => ({ ...prev, ...updates }))
@@ -94,15 +108,24 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
     <div className="min-h-screen bg-[#f7f5f2] flex items-start justify-center py-10 px-4">
       <div className="w-full max-w-md">
 
-        {/* Restaurant name */}
-        <div className="text-center mb-8">
+        {/* Restaurant name + language picker */}
+        <div className="relative text-center mb-8">
           <h1
             className="text-2xl font-semibold text-[#1a1a18]"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
             {restaurantName}
           </h1>
-          <p className="text-sm text-[#7a7060] mt-1">Reserve a table</p>
+          <p className="text-sm text-[#7a7060] mt-1">{t.reserve_table}</p>
+          {availableLanguages.length > 1 && (
+            <div className="absolute top-0 right-0">
+              <LanguagePicker
+                lang={lang}
+                availableLanguages={availableLanguages}
+                onChange={setLang}
+              />
+            </div>
+          )}
         </div>
 
         {/* Public events */}
@@ -135,7 +158,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
                         isActive ? 'text-[#1a1a18] font-medium' : 'text-[#a09880]'
                       }`}
                     >
-                      {STEP_LABELS[s]}
+                      {stepLabels[s]}
                     </span>
                   </div>
                   {i < displayedSteps.length - 1 && (
@@ -155,6 +178,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
               serviceAreas={serviceAreas}
               onChange={updateBooking}
               onNext={nextStep}
+              t={t}
             />
           )}
           {step === 'datetime' && (
@@ -164,6 +188,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
               onChange={updateBooking}
               onNext={nextStep}
               onBack={prevStep}
+              t={t}
             />
           )}
           {step === 'lookup' && (
@@ -172,6 +197,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
               onChange={updateBooking}
               onNext={nextStep}
               onBack={prevStep}
+              t={t}
             />
           )}
           {step === 'guest-details' && (
@@ -180,6 +206,7 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
               onChange={updateBooking}
               onNext={nextStep}
               onBack={prevStep}
+              t={t}
             />
           )}
           {step === 'otp' && (
@@ -189,12 +216,14 @@ export default function BookingWidget({ restaurantId, restaurantName, serviceAre
               onChange={updateBooking}
               onNext={nextStep}
               onBack={prevStep}
+              t={t}
             />
           )}
           {step === 'confirmation' && (
             <StepConfirmation
               booking={booking}
               restaurantName={restaurantName}
+              t={t}
             />
           )}
         </div>

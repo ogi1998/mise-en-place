@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ChevronLeft } from 'lucide-react'
 import { supabaseWidget } from '@/lib/supabase-widget'
 import type { BookingState } from '../BookingWidget'
+import type { WidgetTranslations } from '@/lib/widget-translations'
 
 type Props = {
   booking: BookingState
@@ -11,9 +12,10 @@ type Props = {
   onChange: (updates: Partial<BookingState>) => void
   onNext: () => void
   onBack: () => void
+  t: WidgetTranslations
 }
 
-export default function StepOtp({ booking, restaurantId, onChange, onNext, onBack }: Props) {
+export default function StepOtp({ booking, restaurantId, onChange, onNext, onBack, t }: Props) {
   const [otp, setOtp] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -88,22 +90,22 @@ export default function StepOtp({ booking, restaurantId, onChange, onNext, onBac
             className="text-lg font-semibold text-[#1a1a18]"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
-            Confirm booking
+            {t.otp_title}
           </h2>
           <p className="text-sm text-[#7a7060]">
-            {booking.partySize} {booking.partySize === 1 ? 'guest' : 'guests'} · {booking.date} · {booking.slot}
+            {booking.partySize} {t.guests(booking.partySize)} · {booking.date} · {booking.slot}
           </p>
         </div>
       </div>
 
       <p className="text-sm text-[#7a7060]">
-        We sent a 6-digit code to{' '}
+        {t.otp_sent_to}{' '}
         <span className="text-[#1a1a18] font-medium">{booking.email}</span>
       </p>
 
       <div>
         <label className="block text-xs font-medium text-[#7a7060] mb-1">
-          Verification code
+          {t.otp_code_label}
         </label>
         <input
           type="text"
@@ -124,14 +126,14 @@ export default function StepOtp({ booking, restaurantId, onChange, onNext, onBac
         disabled={loading || otp.length < 8}
         className="w-full py-3 bg-[#1a1a18] text-[#f5f0e8] rounded-xl text-sm font-medium hover:bg-[#2a2a26] disabled:opacity-50 transition-colors"
       >
-        {loading ? 'Confirming…' : 'Confirm booking'}
+        {loading ? t.otp_confirming : t.otp_confirm}
       </button>
 
       <button
         onClick={onBack}
         className="w-full text-center text-xs text-[#7a7060] hover:text-[#1a1a18] transition-colors"
       >
-        Wrong email? Go back to change it
+        {t.otp_wrong_email}
       </button>
     </div>
   )

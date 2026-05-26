@@ -2,6 +2,7 @@ import { Check } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
 import type { TableFormData } from '@/schemas/manager/settings/tables'
 import type { Table } from '@/services/manager/settings/tables/types'
+import Toggle from '@/components/manager/ui/Toggle'
 
 const TABLE_SHAPES = [
   { value: 'rectangle', label: 'Rectangle' },
@@ -27,7 +28,7 @@ export default function InlineTableForm({
   onSubmit,
   onCancel,
 }: Props) {
-  const { register, formState: { errors } } = form
+  const { register, watch, setValue, formState: { errors } } = form
 
   return (
     <div className="px-5 py-4 bg-[#faf9f6] border-l-2 border-[#1a1a18]">
@@ -115,31 +116,28 @@ export default function InlineTableForm({
             <p className="text-[11px] text-red-500 mt-1">{errors.sort_order.message}</p>
           )}
         </div>
-        <div className="col-span-3 flex gap-6 pt-1">
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              {...register('allow_multi')}
-              type="checkbox"
-              className="w-4 h-4 accent-[#1a1a18]"
+        <div className="col-span-3 flex gap-8 pt-2">
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={watch('allow_multi') ?? false}
+              onChange={(v) => setValue('allow_multi', v)}
             />
             <span className="text-sm text-[#1a1a18]">Allow multi-booking</span>
-          </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              {...register('is_active_online')}
-              type="checkbox"
-              className="w-4 h-4 accent-[#1a1a18]"
+          </div>
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={watch('is_active_online') ?? false}
+              onChange={(v) => setValue('is_active_online', v)}
             />
             <span className="text-sm text-[#1a1a18]">Active online booking</span>
-          </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              {...register('is_active')}
-              type="checkbox"
-              className="w-4 h-4 accent-[#1a1a18]"
+          </div>
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={watch('is_active') ?? false}
+              onChange={(v) => setValue('is_active', v)}
             />
             <span className="text-sm text-[#1a1a18]">Is Active</span>
-          </label>
+          </div>
         </div>
       </div>
       {formError && (

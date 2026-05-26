@@ -25,6 +25,8 @@ export default async function WidgetPage({ params }: Props) {
       restaurantName={restaurant.name}
       serviceAreas={serviceAreas}
       events={events}
+      availableLanguages={(restaurant as any).available_languages ?? ['en']}
+      defaultLanguage={(restaurant as any).default_language ?? 'en'}
     />
   )
 }

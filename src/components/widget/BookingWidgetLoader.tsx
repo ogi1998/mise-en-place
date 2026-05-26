@@ -20,6 +20,8 @@ type Props = {
   restaurantName: string
   serviceAreas: WidgetServiceArea[]
   events: WidgetEvent[]
+  availableLanguages: string[]
+  defaultLanguage: string
 }
 
 export default function BookingWidgetLoader(props: Props) {

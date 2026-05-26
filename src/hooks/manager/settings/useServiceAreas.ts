@@ -42,6 +42,7 @@ export function useServiceAreas(initialAreas: ServiceArea[], restaurantId: strin
 			description: '',
 			is_indoor: true,
 			is_active: true,
+			is_bookable_online: true,
 			sort_order: 1
 		}
 	});
@@ -79,6 +80,7 @@ export function useServiceAreas(initialAreas: ServiceArea[], restaurantId: strin
 			description: '',
 			is_indoor: true,
 			is_active: true,
+			is_bookable_online: true,
 			sort_order: areas.length + 1
 		});
 		setAreaFormError(null);
@@ -92,6 +94,7 @@ export function useServiceAreas(initialAreas: ServiceArea[], restaurantId: strin
 			description: area.description ?? '',
 			is_indoor: area.is_indoor,
 			is_active: area.is_active,
+			is_bookable_online: area.is_bookable_online,
 			sort_order: area.sort_order
 		});
 		setAreaFormError(null);

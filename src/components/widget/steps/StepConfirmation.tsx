@@ -2,13 +2,15 @@
 
 import { CheckCircle } from 'lucide-react'
 import type { BookingState } from '../BookingWidget'
+import type { WidgetTranslations } from '@/lib/widget-translations'
 
 type Props = {
   booking: BookingState
   restaurantName: string
+  t: WidgetTranslations
 }
 
-export default function StepConfirmation({ booking, restaurantName }: Props) {
+export default function StepConfirmation({ booking, restaurantName, t }: Props) {
   const [d, m, y] = booking.date.split('-')
   const formattedDate = `${d}.${m}.${y}`
 
@@ -20,40 +22,40 @@ export default function StepConfirmation({ booking, restaurantName }: Props) {
 
       <div>
         <h2 className="text-lg font-semibold text-[#1a1a18]" style={{ fontFamily: 'Playfair Display, serif' }}>
-          Booking confirmed!
+          {t.confirm_title}
         </h2>
         <p className="text-sm text-[#7a7060] mt-1">
-          We look forward to welcoming you at {restaurantName}.
+          {t.confirm_subtitle(restaurantName)}
         </p>
       </div>
 
       <div className="bg-[#f7f5f2] rounded-xl p-4 text-left space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-[#7a7060]">Name</span>
+          <span className="text-[#7a7060]">{t.confirm_name}</span>
           <span className="text-[#1a1a18] font-medium">{booking.firstName} {booking.lastName}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-[#7a7060]">Date</span>
+          <span className="text-[#7a7060]">{t.confirm_date}</span>
           <span className="text-[#1a1a18] font-medium">{formattedDate}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-[#7a7060]">Time</span>
+          <span className="text-[#7a7060]">{t.confirm_time}</span>
           <span className="text-[#1a1a18] font-medium">{booking.slot}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-[#7a7060]">Guests</span>
+          <span className="text-[#7a7060]">{t.confirm_guests}</span>
           <span className="text-[#1a1a18] font-medium">{booking.partySize}</span>
         </div>
         {booking.notes && (
           <div className="flex justify-between text-sm">
-            <span className="text-[#7a7060]">Requests</span>
+            <span className="text-[#7a7060]">{t.confirm_requests}</span>
             <span className="text-[#1a1a18] font-medium">{booking.notes}</span>
           </div>
         )}
       </div>
 
       <p className="text-xs text-[#a09880]">
-        A confirmation will be sent to {booking.email} once the restaurant reviews your booking.
+        {t.confirm_footer(booking.email)}
       </p>
     </div>
   )
