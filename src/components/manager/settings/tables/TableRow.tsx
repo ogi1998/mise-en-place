@@ -1,5 +1,6 @@
-import { Pencil, Trash2, Check, X, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Pencil, Trash2, Check, X } from 'lucide-react'
 import type { Table } from '@/services/manager/settings/tables/types'
+import Toggle from '@/components/manager/ui/Toggle'
 
 type Props = {
   table: Table
@@ -34,22 +35,16 @@ export default function TableRow({
         <StatusDot active={table.allow_multi} />
       </td>
       <td className="px-4 py-3 text-center">
-        <button
-          onClick={() => onToggleField(table, 'is_active_online')}
-          className={`transition-colors ${table.is_active_online ? 'text-emerald-500' : 'text-red-400'}`}
-          title={table.is_active_online ? 'Online booking enabled' : 'Online booking disabled'}
-        >
-          {table.is_active_online ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-        </button>
+        <Toggle
+          checked={table.is_active_online}
+          onChange={() => onToggleField(table, 'is_active_online')}
+        />
       </td>
       <td className="px-4 py-3 text-center">
-        <button
-          onClick={() => onToggleField(table, 'is_active')}
-          className={`transition-colors ${table.is_active ? 'text-emerald-500' : 'text-red-400'}`}
-          title={table.is_active ? 'Table active' : 'Table disabled'}
-        >
-          {table.is_active ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-        </button>
+        <Toggle
+          checked={table.is_active}
+          onChange={() => onToggleField(table, 'is_active')}
+        />
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center justify-end gap-1">

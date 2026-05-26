@@ -3,15 +3,17 @@
 import { Minus, Plus } from 'lucide-react'
 import type { BookingState } from '../BookingWidget'
 import type { WidgetServiceArea } from '@/services/widget/types'
+import type { WidgetTranslations } from '@/lib/widget-translations'
 
 type Props = {
   booking: BookingState
   serviceAreas: WidgetServiceArea[]
   onChange: (updates: Partial<BookingState>) => void
   onNext: () => void
+  t: WidgetTranslations
 }
 
-export default function StepPartySize({ booking, serviceAreas, onChange, onNext }: Props) {
+export default function StepPartySize({ booking, serviceAreas, onChange, onNext, t }: Props) {
   function decrement() {
     if (booking.partySize > 1) onChange({ partySize: booking.partySize - 1 })
   }
@@ -24,9 +26,9 @@ export default function StepPartySize({ booking, serviceAreas, onChange, onNext 
     <div className="p-6 space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-[#1a1a18]" style={{ fontFamily: 'Playfair Display, serif' }}>
-          How many guests?
+          {t.party_title}
         </h2>
-        <p className="text-sm text-[#7a7060] mt-1">Select your party size and preferred area.</p>
+        <p className="text-sm text-[#7a7060] mt-1">{t.party_subtitle}</p>
       </div>
 
       {/* Party size stepper */}
@@ -40,7 +42,7 @@ export default function StepPartySize({ booking, serviceAreas, onChange, onNext 
         </button>
         <div className="text-center">
           <span className="text-4xl font-semibold text-[#1a1a18]">{booking.partySize}</span>
-          <p className="text-xs text-[#a09880] mt-1">{booking.partySize === 1 ? 'guest' : 'guests'}</p>
+          <p className="text-xs text-[#a09880] mt-1">{t.guests(booking.partySize)}</p>
         </div>
         <button
           onClick={increment}
@@ -54,7 +56,7 @@ export default function StepPartySize({ booking, serviceAreas, onChange, onNext 
       {/* Service area selector — only show if more than one area */}
       {serviceAreas.length > 1 && (
         <div>
-          <label className="block text-xs font-medium text-[#7a7060] mb-2">Preferred area</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-2">{t.preferred_area}</label>
           <div className="grid grid-cols-2 gap-2">
             {serviceAreas.map(area => (
               <button
@@ -77,7 +79,7 @@ export default function StepPartySize({ booking, serviceAreas, onChange, onNext 
         onClick={onNext}
         className="w-full py-3 bg-[#1a1a18] text-[#f5f0e8] rounded-xl text-sm font-medium hover:bg-[#2a2a26] transition-colors"
       >
-        Continue
+        {t.continue}
       </button>
     </div>
   )

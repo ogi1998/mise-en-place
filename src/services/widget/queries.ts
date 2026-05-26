@@ -7,7 +7,7 @@ export async function getRestaurantBySlug(
 ): Promise<WidgetRestaurant | null> {
   const { data } = await supabase
     .from("restaurants")
-    .select("id, name, slug")
+    .select("id, name, slug, available_languages, default_language")
     .eq("slug", slug)
     .single();
   return data as WidgetRestaurant | null;

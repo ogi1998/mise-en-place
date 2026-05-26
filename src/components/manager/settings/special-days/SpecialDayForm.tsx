@@ -6,6 +6,7 @@ import type { SpecialDayFormData } from '@/schemas/manager/settings/special-days
 import { SLOT_INTERVAL_OPTIONS } from '@/services/manager/settings/weekly-schedule/utils'
 import DatePicker from '@/components/ui/DatePicker'
 import TimePicker from '@/components/ui/TimePicker'
+import Toggle from '@/components/manager/ui/Toggle'
 
 type Props = {
   form: UseFormReturn<SpecialDayFormData>
@@ -16,7 +17,7 @@ type Props = {
 }
 
 export default function SpecialDayForm({ form, saving, error, onSave, onCancel }: Props) {
-  const { register, handleSubmit, watch, control, formState: { errors } } = form
+  const { register, handleSubmit, watch, setValue, control, formState: { errors } } = form
   const type = watch('type')
 
   return (
@@ -118,14 +119,13 @@ export default function SpecialDayForm({ form, saving, error, onSave, onCancel }
         </div>
       )}
 
-      <label className="flex items-center gap-3 cursor-pointer w-fit">
-        <input
-          type="checkbox"
-          {...register('is_recurring')}
-          className="w-4 h-4 rounded border-[#c8c3b8] accent-[#1a1a18]"
+      <div className="flex items-center gap-4">
+        <Toggle
+          checked={watch('is_recurring') ?? false}
+          onChange={(v) => setValue('is_recurring', v)}
         />
         <span className="text-sm text-[#3a3528]">Repeat every year on this date</span>
-      </label>
+      </div>
 
       <div className="flex items-center gap-3 pt-2 border-t border-[#e8e4dc]">
         <button

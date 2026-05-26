@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from '@/lib/supabase-server'
 import SettingsNavLink from '@/components/manager/settings/SettingsNavLink'
 
 const SETTINGS_NAV = [
+  { href: '/settings/general', label: 'General' },
   { href: '/settings/service-areas', label: 'Service Areas' },
   { href: '/settings/tables', label: 'Tables' },
   { href: '/settings/schedule', label: 'Weekly Schedule' },

@@ -5,6 +5,7 @@ export type ServiceArea = {
   description: string | null
   is_indoor: boolean
   is_active: boolean
+  is_bookable_online: boolean
   sort_order: number
   created_at: string
   updated_at: string

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MapPin, TableProperties, Clock, CalendarDays, SlidersHorizontal } from 'lucide-react'
+import { MapPin, TableProperties, Clock, CalendarDays, SlidersHorizontal, Globe } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -11,6 +11,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   '/settings/schedule': Clock,
   '/settings/special-days': CalendarDays,
   '/settings/rules': SlidersHorizontal,
+  '/settings/general': Globe,
 }
 
 type Props = {

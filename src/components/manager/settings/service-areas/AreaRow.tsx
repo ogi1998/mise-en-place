@@ -40,6 +40,11 @@ export default function AreaRow({
           <span className="text-xs px-1.5 py-0.5 rounded bg-[#f0ede6] text-[#a09880]">
             {area.is_indoor ? 'Indoor' : 'Outdoor'}
           </span>
+          {!area.is_bookable_online && (
+            <span className="text-xs px-1.5 py-0.5 rounded bg-[#f0ede6] text-[#a09880]">
+              Not bookable online
+            </span>
+          )}
         </div>
         {area.description && (
           <p className="text-xs text-[#a09880] mt-0.5 truncate">{area.description}</p>

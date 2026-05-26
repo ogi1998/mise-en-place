@@ -2,6 +2,7 @@ import { Check } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
 import type { ServiceAreaFormData } from '@/schemas/manager/settings/service-areas'
 import type { ServiceArea } from '@/services/manager/settings/service-areas/types'
+import Toggle from '@/components/manager/ui/Toggle'
 
 type Props = {
   area?: ServiceArea
@@ -20,7 +21,7 @@ export default function InlineAreaForm({
   onSubmit,
   onCancel,
 }: Props) {
-  const { register, formState: { errors } } = areaForm
+  const { register, watch, setValue, formState: { errors } } = areaForm
 
   return (
     <div className="px-5 py-4 bg-[#faf9f6] border-l-2 border-[#1a1a18]">
@@ -61,23 +62,28 @@ export default function InlineAreaForm({
             <p className="text-[11px] text-red-500 mt-1">{errors.sort_order.message}</p>
           )}
         </div>
-        <div className="flex flex-col gap-3 pt-1">
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              {...register('is_indoor')}
-              type="checkbox"
-              className="w-4 h-4 accent-[#1a1a18]"
+        <div className="flex flex-col gap-4 pt-2">
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={watch('is_indoor') ?? false}
+              onChange={(v) => setValue('is_indoor', v)}
             />
             <span className="text-sm text-[#1a1a18]">Indoor area</span>
-          </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <input
-              {...register('is_active')}
-              type="checkbox"
-              className="w-4 h-4 accent-[#1a1a18]"
+          </div>
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={watch('is_bookable_online') ?? false}
+              onChange={(v) => setValue('is_bookable_online', v)}
+            />
+            <span className="text-sm text-[#1a1a18]">Bookable online</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Toggle
+              checked={watch('is_active') ?? false}
+              onChange={(v) => setValue('is_active', v)}
             />
             <span className="text-sm text-[#1a1a18]">Active</span>
-          </label>
+          </div>
         </div>
       </div>
       {areaFormError && (

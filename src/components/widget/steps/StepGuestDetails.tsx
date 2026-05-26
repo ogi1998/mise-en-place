@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { supabaseWidget } from '@/lib/supabase-widget'
 import type { BookingState } from '../BookingWidget'
+import type { WidgetTranslations } from '@/lib/widget-translations'
 
 const guestSchema = z.object({
   firstName: z.string().min(1, 'Required'),
@@ -28,9 +29,10 @@ type Props = {
   onChange: (updates: Partial<BookingState>) => void
   onNext: () => void
   onBack: () => void
+  t: WidgetTranslations
 }
 
-export default function StepGuestDetails({ booking, onChange, onNext, onBack }: Props) {
+export default function StepGuestDetails({ booking, onChange, onNext, onBack, t }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
@@ -81,17 +83,17 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
         </button>
         <div>
           <h2 className="text-lg font-semibold text-[#1a1a18]" style={{ fontFamily: 'Playfair Display, serif' }}>
-            Your details
+            {t.details_title}
           </h2>
           <p className="text-sm text-[#7a7060]">
-            {booking.partySize} {booking.partySize === 1 ? 'guest' : 'guests'} · {booking.date} · {booking.slot}
+            {booking.partySize} {t.guests(booking.partySize)} · {booking.date} · {booking.slot}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs font-medium text-[#7a7060] mb-1">First name</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_first_name}</label>
           <input
             {...register('firstName')}
             className="w-full px-3 py-2.5 text-sm border border-[#e8e4dc] rounded-xl bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
@@ -99,7 +101,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
           {errors.firstName && <p className="mt-1 text-xs text-red-500">{errors.firstName.message}</p>}
         </div>
         <div>
-          <label className="block text-xs font-medium text-[#7a7060] mb-1">Last name</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_last_name}</label>
           <input
             {...register('lastName')}
             className="w-full px-3 py-2.5 text-sm border border-[#e8e4dc] rounded-xl bg-white text-[#1a1a18] focus:outline-none focus:border-[#1a1a18]"
@@ -107,7 +109,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
           {errors.lastName && <p className="mt-1 text-xs text-red-500">{errors.lastName.message}</p>}
         </div>
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-[#7a7060] mb-1">Email</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_email}</label>
           <input
             {...register('email')}
             type="email"
@@ -116,7 +118,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
           {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
         </div>
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-[#7a7060] mb-1">Phone</label>
+          <label className="block text-xs font-medium text-[#7a7060] mb-1">{t.details_phone}</label>
           <input
             {...register('phone')}
             type="tel"
@@ -127,7 +129,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
         </div>
         <div className="col-span-2">
           <label className="block text-xs font-medium text-[#7a7060] mb-1">
-            Special requests <span className="text-[#a09880] font-normal">(optional)</span>
+            {t.details_notes} <span className="text-[#a09880] font-normal">({t.optional})</span>
           </label>
           <textarea
             {...register('notes')}
@@ -139,7 +141,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
 
       <div>
         <label className="block text-xs font-medium text-[#7a7060] mb-2">
-          Allergens <span className="text-[#a09880] font-normal">(optional)</span>
+          {t.details_allergens} <span className="text-[#a09880] font-normal">({t.optional})</span>
         </label>
         <div className="flex flex-wrap gap-2">
           {ALLERGEN_OPTIONS.map(allergen => {
@@ -169,7 +171,7 @@ export default function StepGuestDetails({ booking, onChange, onNext, onBack }: 
         disabled={submitting}
         className="w-full py-3 bg-[#1a1a18] text-[#f5f0e8] rounded-xl text-sm font-medium hover:bg-[#2a2a26] disabled:opacity-50 transition-colors"
       >
-        {submitting ? 'Sending…' : 'Send confirmation code'}
+        {submitting ? t.details_sending : t.details_send_code}
       </button>
     </div>
   )

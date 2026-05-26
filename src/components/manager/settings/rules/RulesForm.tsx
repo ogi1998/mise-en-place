@@ -3,6 +3,7 @@
 import type { UseFormReturn } from 'react-hook-form'
 import type { RulesFormData } from '@/schemas/manager/settings/rules'
 import { REMINDER_OPTIONS } from '@/services/manager/settings/rules/utils'
+import Toggle from '@/components/manager/ui/Toggle'
 
 type Props = {
   form: UseFormReturn<RulesFormData>
@@ -49,6 +50,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 export default function RulesForm({ form, saving, saveError, saveSuccess, onSave }: Props) {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = form
+  const thankYouEmail = watch('thank_you_email')
   const reminderIntervals = watch('reminder_intervals')
   const waitlistEnabled = watch('waitlist_enabled')
 
@@ -118,14 +120,13 @@ export default function RulesForm({ form, saving, saveError, saveSuccess, onSave
       <div>
         <SectionTitle>Waitlist</SectionTitle>
         <div className="space-y-3 mt-3">
-          <label className="flex items-center gap-3 cursor-pointer w-fit">
-            <input
-              type="checkbox"
-              {...register('waitlist_enabled')}
-              className="w-4 h-4 rounded border-[#c8c3b8] accent-[#1a1a18]"
+          <div className="flex items-center gap-4">
+            <Toggle
+              checked={waitlistEnabled ?? false}
+              onChange={(v) => setValue('waitlist_enabled', v)}
             />
             <span className="text-sm text-[#3a3528]">Enable waitlist</span>
-          </label>
+          </div>
           {waitlistEnabled && (
             <Field label="Confirmation window (min)" hint="How long guest has to confirm when a slot opens" error={errors.waitlist_confirmation_window?.message}>
               <NumberInput
@@ -163,14 +164,13 @@ export default function RulesForm({ form, saving, saveError, saveSuccess, onSave
 
       <div>
         <SectionTitle>Notifications</SectionTitle>
-        <label className="flex items-center gap-3 cursor-pointer w-fit mt-3">
-          <input
-            type="checkbox"
-            {...register('thank_you_email')}
-            className="w-4 h-4 rounded border-[#c8c3b8] accent-[#1a1a18]"
+        <div className="flex items-center gap-4 mt-3">
+          <Toggle
+            checked={thankYouEmail ?? false}
+            onChange={(v) => setValue('thank_you_email', v)}
           />
           <span className="text-sm text-[#3a3528]">Send thank you email after visit</span>
-        </label>
+        </div>
       </div>
 
       <div className="flex items-center gap-3 pt-2 border-t border-[#e8e4dc]">
