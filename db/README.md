@@ -1,5 +1,7 @@
 # db/ — schema snapshot of the Supabase cloud database
 
+> **Frozen snapshot (2026-11-19), kept for a future move off Supabase.** The source of truth for the schema is now `supabase/migrations/` — every later change lives there, not here. Before moving off Supabase, regenerate this folder from the current cloud schema (see "Re-pulling from Supabase" below).
+
 Schema-only snapshot of the Supabase cloud project (`aocpvyjykotqwkuvwrpi`, Postgres 17), taken 2026-11-19. It is the baseline for moving to local Postgres + ORM + app-managed auth.
 
 | Path | What |
